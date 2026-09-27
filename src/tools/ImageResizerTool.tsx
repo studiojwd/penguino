@@ -3,6 +3,8 @@ import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
 import { downloadImageBlob, formatBytes, imageToBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
+type ResizeMode = 'width' | 'height' | 'exact'
+
 const ImageResizerTool = () => {
   const [file, setFile] = useState<File | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
@@ -11,9 +13,10 @@ const ImageResizerTool = () => {
   const [height, setHeight] = useState(800)
   const [sourceWidth, setSourceWidth] = useState(0)
   const [sourceHeight, setSourceHeight] = useState(0)
-  const [locked, setLocked] = useState(true)
+  const [resizeMode, setResizeMode] = useState<ResizeMode>('width')
   const [format, setFormat] = useState<RasterFormat>('webp')
   const [quality, setQuality] = useState(0.86)
+  const [prefix, setPrefix] = useState('')
   const [estimate, setEstimate] = useState('Add an image to begin')
 
   useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl) }, [previewUrl])
@@ -37,13 +40,20 @@ const ImageResizerTool = () => {
   const changeWidth = (nextWidth: number) => {
     const safeWidth = Math.max(1, nextWidth || 1)
     setWidth(safeWidth)
-    if (locked && sourceWidth) setHeight(Math.max(1, Math.round(safeWidth * sourceHeight / sourceWidth)))
+    if (resizeMode === 'width' && sourceWidth) setHeight(Math.max(1, Math.round(safeWidth * sourceHeight / sourceWidth)))
   }
 
   const changeHeight = (nextHeight: number) => {
     const safeHeight = Math.max(1, nextHeight || 1)
     setHeight(safeHeight)
-    if (locked && sourceHeight) setWidth(Math.max(1, Math.round(safeHeight * sourceWidth / sourceHeight)))
+    if (resizeMode === 'height' && sourceHeight) setWidth(Math.max(1, Math.round(safeHeight * sourceWidth / sourceHeight)))
+  }
+
+  const changeResizeMode = (nextMode: ResizeMode) => {
+    setResizeMode(nextMode)
+    if (!sourceWidth || !sourceHeight) return
+    if (nextMode === 'width') setHeight(Math.max(1, Math.round(width * sourceHeight / sourceWidth)))
+    if (nextMode === 'height') setWidth(Math.max(1, Math.round(height * sourceWidth / sourceHeight)))
   }
 
   const handleDownload = async () => {
@@ -52,7 +62,7 @@ const ImageResizerTool = () => {
     try {
       const blob = await imageToBlob(image, width, height, format, quality)
       setEstimate(`${formatBytes(blob.size)} ready`)
-      downloadImageBlob(blob, file.name, `${width}x${height}`, format)
+      downloadImageBlob(blob, file.name, `${width}x${height}`, format, prefix)
     } catch (error) {
       setEstimate(error instanceof Error ? error.message : 'Resize failed.')
     }
@@ -65,17 +75,22 @@ const ImageResizerTool = () => {
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="PNG, JPEG or WebP" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section">
           <div className="drawer-section__title"><h2>Dimensions</h2>{sourceWidth ? <span>{sourceWidth} × {sourceHeight}px</span> : null}</div>
+          <div className="resize-mode-options" role="group" aria-label="Resize by">
+            <button className={resizeMode === 'width' ? 'resize-mode resize-mode--active' : 'resize-mode'} onClick={() => changeResizeMode('width')} type="button"><strong>Width</strong><span>Height auto</span></button>
+            <button className={resizeMode === 'height' ? 'resize-mode resize-mode--active' : 'resize-mode'} onClick={() => changeResizeMode('height')} type="button"><strong>Height</strong><span>Width auto</span></button>
+            <button className={resizeMode === 'exact' ? 'resize-mode resize-mode--active' : 'resize-mode'} onClick={() => changeResizeMode('exact')} type="button"><strong>Exact</strong><span>May stretch</span></button>
+          </div>
           <div className="dimension-grid">
-            <label className="field"><span>Width (px)</span><input min="1" onChange={(event) => changeWidth(Number(event.target.value))} type="number" value={width} /></label>
-            <button aria-label={locked ? 'Unlock proportions' : 'Lock proportions'} className={`ratio-lock ${locked ? 'ratio-lock--active' : ''}`} onClick={() => setLocked((current) => !current)} type="button">{locked ? 'Linked' : 'Free'}</button>
-            <label className="field"><span>Height (px)</span><input min="1" onChange={(event) => changeHeight(Number(event.target.value))} type="number" value={height} /></label>
+            <label className="field"><span>Width (px){resizeMode === 'height' ? ' · auto' : ''}</span><input disabled={resizeMode === 'height'} min="1" onChange={(event) => changeWidth(Number(event.target.value))} type="number" value={width} /></label>
+            <label className="field"><span>Height (px){resizeMode === 'width' ? ' · auto' : ''}</span><input disabled={resizeMode === 'width'} min="1" onChange={(event) => changeHeight(Number(event.target.value))} type="number" value={height} /></label>
           </div>
-          <div className="preset-row">
-            {[600, 1080, 1200, 1920].map((preset) => <button className="chip-button" key={preset} onClick={() => changeWidth(preset)} type="button">{preset}px</button>)}
-          </div>
+          {resizeMode !== 'exact' ? <div className="preset-row">
+            {[600, 1080, 1200, 1920].map((preset) => <button className="chip-button" key={preset} onClick={() => resizeMode === 'height' ? changeHeight(preset) : changeWidth(preset)} type="button">{preset}px</button>)}
+          </div> : null}
         </section>
         <section className="drawer-section">
           <h2>Export</h2>
+          <label className="field"><span>Filename prefix <small>Optional</small></span><input placeholder="e.g. campaign" type="text" value={prefix} onChange={(event) => setPrefix(event.target.value)} /></label>
           <label className="field"><span>Format</span><select onChange={(event) => setFormat(event.target.value as RasterFormat)} value={format}><option value="webp">WebP</option><option value="jpeg">JPEG</option><option value="png">PNG</option></select></label>
           {format !== 'png' ? <label className="field"><span>Quality {Math.round(quality * 100)}%</span><input max="1" min="0.2" onChange={(event) => setQuality(Number(event.target.value))} step="0.01" type="range" value={quality} /></label> : null}
         </section>

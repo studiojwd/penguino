@@ -1,22 +1,26 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import Icon, { type IconName } from './components/Icon'
 import PenguinMascot from './components/PenguinMascot'
-import FileConverterTool from './tools/FileConverterTool'
-import FaviconGeneratorTool from './tools/FaviconGeneratorTool'
-import BulkImageResizerTool from './tools/BulkImageResizerTool'
-import ImageResizerTool from './tools/ImageResizerTool'
-import PdfCompressorTool from './tools/PdfCompressorTool'
-import TextGraphicTool from './tools/TextGraphicTool'
 
-type ToolPage = 'text' | 'resize' | 'convert' | 'favicon' | 'bulk-resize' | 'pdf-compress'
+const TextGraphicTool = lazy(() => import('./tools/TextGraphicTool'))
+const ImageResizerTool = lazy(() => import('./tools/ImageResizerTool'))
+const FileConverterTool = lazy(() => import('./tools/FileConverterTool'))
+const ImageOptimiserTool = lazy(() => import('./tools/ImageOptimiserTool'))
+const BackgroundRemoverTool = lazy(() => import('./tools/BackgroundRemoverTool'))
+const FaviconGeneratorTool = lazy(() => import('./tools/FaviconGeneratorTool'))
+const BulkImageResizerTool = lazy(() => import('./tools/BulkImageResizerTool'))
+const PdfCompressorTool = lazy(() => import('./tools/PdfCompressorTool'))
+
+type ToolPage = 'text' | 'resize' | 'convert' | 'optimise' | 'remove-background' | 'favicon' | 'bulk-resize' | 'pdf-compress'
 type Page = 'home' | ToolPage | 'settings' | 'about' | 'terms'
 
 const PAGE_KEY = 'penguino/active-page/v1'
+const SITE_URL = 'https://www.penguino.app'
 
 const PAGE_METADATA: Record<Page, { title: string; description: string }> = {
   home: {
     title: 'Penguino | Free Browser-Based Creative Tools',
-    description: "Create text graphics, resize and convert images, generate favicons, and compress PDFs with Penguino's private browser-based tools."
+    description: "Create text graphics, resize, optimise and convert images, remove backgrounds, generate favicons, and compress PDFs with Penguino's private browser-based tools."
   },
   text: {
     title: 'Text Graphic Maker | Penguino',
@@ -29,6 +33,14 @@ const PAGE_METADATA: Record<Page, { title: string; description: string }> = {
   convert: {
     title: 'Free Image File Converter | Penguino',
     description: 'Convert images between PNG, JPEG and WebP formats privately in your browser with adjustable export quality.'
+  },
+  optimise: {
+    title: 'Free Image Optimiser | Penguino',
+    description: 'Compress PNG, JPEG and WebP images locally with adjustable quality, file-size savings and a live before-and-after comparison.'
+  },
+  'remove-background': {
+    title: 'Free Background Remover | Penguino',
+    description: 'Remove solid and simple image backgrounds locally, refine the edges and download a transparent PNG without uploading your file.'
   },
   favicon: {
     title: 'Free Favicon Generator | Penguino',
@@ -56,32 +68,34 @@ const PAGE_METADATA: Record<Page, { title: string; description: string }> = {
   }
 }
 
+const isPage = (value: string): value is Page => Object.prototype.hasOwnProperty.call(PAGE_METADATA, value)
+
 const tools: Array<{
   page: ToolPage
   path: string
   icon: IconName
   eyebrow: string
   title: string
+  navTitle?: string
   description: string
   tone: string
   artwork?: string
   artworkPosition?: 'left' | 'center' | 'right'
+  blendArtwork?: boolean
 }> = [
   { page: 'text', path: '/text-graphic', icon: 'type', eyebrow: 'Create', title: 'Text graphic', description: 'Turn words into crisp, on-brand graphics.', tone: 'orange', artwork: '/assets/penguino-text.png' },
   { page: 'resize', path: '/image-resizer', icon: 'resize', eyebrow: 'Resize', title: 'Image resizer', description: 'Resize images to exact pixel dimensions.', tone: 'blue', artwork: '/assets/penguino-resize.png' },
   { page: 'convert', path: '/file-converter', icon: 'convert', eyebrow: 'Convert', title: 'File converter', description: 'Switch between PNG, JPEG and WebP.', tone: 'pink', artwork: '/assets/penguino-convert.png' },
+  { page: 'optimise', path: '/image-optimiser', icon: 'sparkles', eyebrow: 'Optimise', title: 'Image optimiser', description: 'Compress images and compare quality before downloading.', tone: 'cyan', artwork: '/assets/penguino-optimise.png', blendArtwork: true },
+  { page: 'remove-background', path: '/background-remover', icon: 'image', eyebrow: 'Remove', title: 'Background remover', navTitle: 'Remove BG', description: 'Remove simple backgrounds and export a transparent PNG.', tone: 'violet', artwork: '/assets/penguino-background-remover.png' },
   { page: 'favicon', path: '/favicon-generator', icon: 'favicon', eyebrow: 'Create', title: 'Favicon generator', description: 'Create a complete favicon package from one image.', tone: 'yellow', artwork: '/assets/penguino-new-tools.png', artworkPosition: 'left' },
   { page: 'bulk-resize', path: '/bulk-image-resizer', icon: 'layers', eyebrow: 'Resize', title: 'Bulk image resizer', description: 'Resize multiple images with one set of dimensions.', tone: 'mint', artwork: '/assets/penguino-new-tools.png', artworkPosition: 'center' },
   { page: 'pdf-compress', path: '/pdf-compressor', icon: 'pdf', eyebrow: 'Compress', title: 'PDF compressor', description: 'Reduce PDF file size locally in your browser.', tone: 'lavender', artwork: '/assets/penguino-new-tools.png', artworkPosition: 'right' }
 ]
 
 const pathToPage = (pathname: string): Page => {
-  if (pathname === '/text-graphic') return 'text'
-  if (pathname === '/image-resizer') return 'resize'
-  if (pathname === '/file-converter') return 'convert'
-  if (pathname === '/favicon-generator') return 'favicon'
-  if (pathname === '/bulk-image-resizer') return 'bulk-resize'
-  if (pathname === '/pdf-compressor') return 'pdf-compress'
+  const tool = tools.find((item) => item.path === pathname)
+  if (tool) return tool.page
   if (pathname === '/settings') return 'settings'
   if (pathname === '/about') return 'about'
   if (pathname === '/terms') return 'terms'
@@ -96,8 +110,8 @@ const pageToPath = (page: Page) => {
 }
 
 const readInitialPage = (): Page => {
-  const hash = window.location.hash.replace('#/', '') as Page
-  if (['home', 'text', 'resize', 'convert', 'favicon', 'bulk-resize', 'pdf-compress', 'settings', 'about', 'terms'].includes(hash)) return hash
+  const hash = window.location.hash.replace('#/', '')
+  if (isPage(hash)) return hash
   return pathToPage(window.location.pathname)
 }
 
@@ -123,7 +137,7 @@ const Dashboard = ({ onOpen }: { onOpen: (page: Page) => void }) => (
       <div className="tool-card-grid">
         {tools.map((tool, index) => (
           <a className={`tool-card tool-card--${tool.tone}`} href={tool.path} key={tool.page} onClick={(event) => { event.preventDefault(); onOpen(tool.page) }} style={{ animationDelay: `${index * 80}ms` }}>
-            <span className="tool-card__visual">{tool.artwork ? <img alt="" className={tool.artworkPosition ? 'tool-card__sprite-artwork' : undefined} src={tool.artwork} style={tool.artworkPosition ? { objectPosition: tool.artworkPosition } : undefined} /> : <span className="tool-card__placeholder"><Icon name={tool.icon} /></span>}<i /></span>
+            <span className="tool-card__visual">{tool.artwork ? <img alt="" className={[tool.artworkPosition ? 'tool-card__sprite-artwork' : '', tool.blendArtwork ? 'tool-card__blend-artwork' : ''].filter(Boolean).join(' ') || undefined} decoding="async" loading="lazy" src={tool.artwork} style={tool.artworkPosition ? { objectPosition: tool.artworkPosition } : undefined} /> : <span className="tool-card__placeholder"><Icon name={tool.icon} /></span>}<i /></span>
             <span className="tool-card__copy"><small>{tool.eyebrow}</small><strong>{tool.title}</strong><span>{tool.description}</span></span>
             <span className="tool-card__arrow"><Icon name="arrow" /></span>
           </a>
@@ -220,8 +234,8 @@ const App = () => {
   }
 
   useEffect(() => {
-    const legacyPage = window.location.hash.replace('#/', '') as Page
-    if (['home', 'text', 'resize', 'convert', 'favicon', 'bulk-resize', 'pdf-compress', 'settings', 'about', 'terms'].includes(legacyPage)) {
+    const legacyPage = window.location.hash.replace('#/', '')
+    if (isPage(legacyPage)) {
       window.history.replaceState({}, '', pageToPath(legacyPage))
     }
 
@@ -238,6 +252,10 @@ const App = () => {
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', metadata.description)
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', metadata.title)
     document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', metadata.description)
+    const canonicalUrl = `${SITE_URL}${pageToPath(page)}`
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonicalUrl)
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', canonicalUrl)
+    window.gtag?.('event', 'page_view', { page_title: metadata.title, page_location: canonicalUrl })
   }, [page])
 
   const activeTool = tools.find((tool) => tool.page === page)
@@ -245,18 +263,18 @@ const App = () => {
   return (
     <div className="penguino-shell">
       <header className="mobile-header">
-        <button aria-label="Open navigation" className="mobile-menu" onClick={() => setMobileNavOpen(true)} type="button"><Icon name="menu" /></button>
+        <button aria-controls="app-navigation" aria-expanded={mobileNavOpen} aria-label="Open navigation" className="mobile-menu" onClick={() => setMobileNavOpen(true)} type="button"><Icon name="menu" /></button>
         <a className="brand-mark brand-mark--mobile" href="/" onClick={(event) => { event.preventDefault(); navigate('home') }}><img alt="" src="/assets/penguino-wave.png" /><strong>Penguino<i>.</i></strong></a>
       </header>
 
-      <aside className={`app-sidebar ${mobileNavOpen ? 'app-sidebar--open' : ''}`}>
+      <aside className={`app-sidebar ${mobileNavOpen ? 'app-sidebar--open' : ''}`} id="app-navigation">
         <div className="sidebar-top">
           <a className="brand-mark" href="/" onClick={(event) => { event.preventDefault(); navigate('home') }}><img alt="" src="/assets/penguino-wave.png" /><strong>Penguino<i>.</i></strong></a>
           <button aria-label="Close navigation" className="sidebar-close" onClick={() => setMobileNavOpen(false)} type="button"><Icon name="close" /></button>
         </div>
         <nav aria-label="Main navigation">
-          <a className={page === 'home' ? 'nav-item nav-item--active' : 'nav-item'} href="/" onClick={(event) => { event.preventDefault(); navigate('home') }}><Icon name="home" /><span>Home</span></a>
-          {tools.map((tool) => <a className={page === tool.page ? 'nav-item nav-item--active' : 'nav-item'} href={tool.path} key={tool.page} onClick={(event) => { event.preventDefault(); navigate(tool.page) }}><Icon name={tool.icon} /><span>{tool.title}</span></a>)}
+          <a aria-current={page === 'home' ? 'page' : undefined} className={page === 'home' ? 'nav-item nav-item--active' : 'nav-item'} href="/" onClick={(event) => { event.preventDefault(); navigate('home') }}><Icon name="home" /><span>Home</span></a>
+          {tools.map((tool) => <a aria-current={page === tool.page ? 'page' : undefined} className={page === tool.page ? 'nav-item nav-item--active' : 'nav-item'} href={tool.path} key={tool.page} onClick={(event) => { event.preventDefault(); navigate(tool.page) }}><Icon name={tool.icon} /><span>{tool.navTitle ?? tool.title}</span></a>)}
         </nav>
         <nav className="sidebar-secondary" aria-label="Secondary navigation">
           <a className={page === 'settings' ? 'nav-item nav-item--active' : 'nav-item'} href="/settings" onClick={(event) => { event.preventDefault(); navigate('settings') }}><Icon name="settings" /><span>Settings</span></a>
@@ -271,12 +289,16 @@ const App = () => {
       <main className="app-content">
         {page !== 'home' ? <div className="tool-topbar"><button onClick={() => navigate('home')} type="button">All tools</button><span>/</span><strong>{page === 'settings' ? 'Settings' : page === 'about' ? 'About' : page === 'terms' ? 'Terms and Conditions' : activeTool?.title}</strong><i>{page === 'terms' ? 'Legal' : page === 'about' ? 'Our story' : 'Runs locally'}</i></div> : null}
         {page === 'home' ? <Dashboard onOpen={navigate} /> : null}
-        {page === 'text' ? <TextGraphicTool /> : null}
-        {page === 'resize' ? <ImageResizerTool /> : null}
-        {page === 'convert' ? <FileConverterTool /> : null}
-        {page === 'favicon' ? <FaviconGeneratorTool /> : null}
-        {page === 'bulk-resize' ? <BulkImageResizerTool /> : null}
-        {page === 'pdf-compress' ? <PdfCompressorTool /> : null}
+        <Suspense fallback={<div className="tool-loading" role="status"><PenguinMascot /><strong>Opening tool...</strong></div>}>
+          {page === 'text' ? <TextGraphicTool /> : null}
+          {page === 'resize' ? <ImageResizerTool /> : null}
+          {page === 'convert' ? <FileConverterTool /> : null}
+          {page === 'optimise' ? <ImageOptimiserTool /> : null}
+          {page === 'remove-background' ? <BackgroundRemoverTool /> : null}
+          {page === 'favicon' ? <FaviconGeneratorTool /> : null}
+          {page === 'bulk-resize' ? <BulkImageResizerTool /> : null}
+          {page === 'pdf-compress' ? <PdfCompressorTool /> : null}
+        </Suspense>
         {page === 'settings' ? <SettingsPage /> : null}
         {page === 'about' ? <AboutPage /> : null}
         {page === 'terms' ? <TermsPage /> : null}

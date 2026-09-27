@@ -1,10 +1,14 @@
 # Penguino
 
-A standalone local creative toolkit with three browser-based tools:
+A standalone local creative toolkit with browser-based tools for:
 
 - Brand text graphics with reusable brand presets
-- Image resizing with locked or free proportions
+- Single and bulk image resizing
+- Image optimisation with before-and-after comparison
+- Solid and simple background removal with transparent PNG export
 - PNG, JPEG, and WebP file conversion
+- Favicon package generation
+- PDF compression
 
 Penguino runs entirely in the browser. Images are processed locally and are not uploaded. It uses `localStorage` for brand presets, editor settings, saved drafts, and the most recently opened tool. There is no backend.
 
@@ -14,6 +18,8 @@ Penguino runs entirely in the browser. Images are processed locally and are not 
 - `/text-graphic` — text graphic editor
 - `/image-resizer` — image resizer
 - `/file-converter` — image converter
+- `/image-optimiser` — image compression with before-and-after comparison
+- `/background-remover` — local removal of solid and simple image backgrounds
 - `/favicon-generator` — favicon package generator
 - `/bulk-image-resizer` — multi-file image resizer
 - `/pdf-compressor` — browser-side PDF compressor

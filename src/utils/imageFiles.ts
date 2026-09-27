@@ -43,13 +43,14 @@ export const imageToBlob = async (
   })
 }
 
-export const downloadImageBlob = (blob: Blob, sourceName: string, suffix: string, format: RasterFormat) => {
+export const downloadImageBlob = (blob: Blob, sourceName: string, suffix: string, format: RasterFormat, prefix = '') => {
   const stem = sourceName.replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'penguino_image'
+  const cleanPrefix = prefix.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '')
   const extension = format === 'jpeg' ? 'jpg' : format
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `${stem}_${suffix}.${extension}`
+  link.download = `${cleanPrefix ? `${cleanPrefix}_` : ''}${stem}_${suffix}.${extension}`
   link.click()
   window.setTimeout(() => URL.revokeObjectURL(url), 500)
 }
