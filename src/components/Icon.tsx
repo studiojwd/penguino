@@ -14,6 +14,9 @@ export type IconName =
   | 'close'
   | 'settings'
   | 'document'
+  | 'favicon'
+  | 'layers'
+  | 'pdf'
 
 interface IconProps extends SVGProps<SVGSVGElement> {
   name: IconName
@@ -32,7 +35,10 @@ const paths: Record<IconName, JSX.Element> = {
   image: <><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m3 16 5-4 4 3 3-2 6 5"/></>,
   close: <><path d="m6 6 12 12M18 6 6 18"/></>,
   settings: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></>,
-  document: <><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></>
+  document: <><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></>,
+  favicon: <><path d="m12 3 2.5 5.3 5.5.8-4 4 .9 5.7-4.9-2.7-4.9 2.7.9-5.7-4-4 5.5-.8z"/></>,
+  layers: <><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></>,
+  pdf: <><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M8 16v-5h2a1.5 1.5 0 0 1 0 3H8M13 16v-5h1.5a2.5 2.5 0 0 1 0 5H13"/></>
 }
 
 const Icon = ({ name, ...props }: IconProps) => (

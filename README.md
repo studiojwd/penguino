@@ -14,8 +14,12 @@ Penguino runs entirely in the browser. Images are processed locally and are not 
 - `/text-graphic` — text graphic editor
 - `/image-resizer` — image resizer
 - `/file-converter` — image converter
+- `/favicon-generator` — favicon package generator
+- `/bulk-image-resizer` — multi-file image resizer
+- `/pdf-compressor` — browser-side PDF compressor
 - `/settings` — settings placeholder
-- `/terms` — terms and conditions placeholder
+- `/about` — about Penguino and its creator
+- `/terms` — terms and conditions
 
 These are real browser paths rather than hash fragments. The included `public/_redirects` file provides the single-page-app fallback on compatible static hosts. Configure an equivalent fallback to `index.html` if another hosting provider is used.
 
