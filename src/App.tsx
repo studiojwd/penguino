@@ -10,8 +10,11 @@ const BackgroundRemoverTool = lazy(() => import('./tools/BackgroundRemoverTool')
 const FaviconGeneratorTool = lazy(() => import('./tools/FaviconGeneratorTool'))
 const BulkImageResizerTool = lazy(() => import('./tools/BulkImageResizerTool'))
 const PdfCompressorTool = lazy(() => import('./tools/PdfCompressorTool'))
+const MetadataRemoverTool = lazy(() => import('./tools/MetadataRemoverTool'))
+const FilePackerTool = lazy(() => import('./tools/FilePackerTool'))
+const PaletteExtractorTool = lazy(() => import('./tools/PaletteExtractorTool'))
 
-type ToolPage = 'text' | 'resize' | 'convert' | 'optimise' | 'remove-background' | 'favicon' | 'bulk-resize' | 'pdf-compress'
+type ToolPage = 'text' | 'resize' | 'convert' | 'optimise' | 'remove-background' | 'favicon' | 'bulk-resize' | 'pdf-compress' | 'metadata' | 'pack' | 'palette'
 type Page = 'home' | ToolPage | 'settings' | 'about' | 'terms'
 
 const PAGE_KEY = 'penguino/active-page/v1'
@@ -20,7 +23,7 @@ const SITE_URL = 'https://www.penguino.app'
 const PAGE_METADATA: Record<Page, { title: string; description: string }> = {
   home: {
     title: 'Penguino | Free Browser-Based Creative Tools',
-    description: "Create text graphics, resize, optimise and convert images, remove backgrounds, generate favicons, and compress PDFs with Penguino's private browser-based tools."
+    description: "Create text graphics, resize and optimise images, remove metadata, extract colour palettes, pack files, generate favicons, and compress PDFs with Penguino's private browser-based tools."
   },
   text: {
     title: 'Text Graphic Maker | Penguino',
@@ -54,6 +57,18 @@ const PAGE_METADATA: Record<Page, { title: string; description: string }> = {
     title: 'Free PDF Compressor | Penguino',
     description: 'Reduce PDF file sizes locally in your browser with a choice of compression levels and no document upload.'
   },
+  metadata: {
+    title: 'Free Image Metadata Remover | Penguino',
+    description: 'Remove EXIF, location, camera and other embedded metadata from PNG, JPEG and WebP images privately in your browser.'
+  },
+  pack: {
+    title: 'Free File ZIP Packer | Penguino',
+    description: 'Bundle up to 50 files into one named ZIP archive locally in your browser, with optional filename prefixing.'
+  },
+  palette: {
+    title: 'Free Colour Palette Extractor | Penguino',
+    description: 'Extract a colour palette from any PNG, JPEG or WebP image, copy HEX values and download ready-to-use CSS.'
+  },
   settings: {
     title: 'Settings | Penguino',
     description: 'Manage your Penguino creative toolkit settings and browser-based preferences.'
@@ -80,7 +95,8 @@ const tools: Array<{
   description: string
   tone: string
   artwork?: string
-  artworkPosition?: 'left' | 'center' | 'right'
+  artworkPosition?: string
+  artworkColumns?: 4
   blendArtwork?: boolean
 }> = [
   { page: 'text', path: '/text-graphic', icon: 'type', eyebrow: 'Create', title: 'Text graphic', description: 'Turn words into crisp, on-brand graphics.', tone: 'orange', artwork: '/assets/penguino-text.png' },
@@ -90,7 +106,10 @@ const tools: Array<{
   { page: 'remove-background', path: '/background-remover', icon: 'image', eyebrow: 'Remove', title: 'Background remover', navTitle: 'Remove BG', description: 'Remove simple backgrounds and export a transparent PNG.', tone: 'violet', artwork: '/assets/penguino-background-remover.png' },
   { page: 'favicon', path: '/favicon-generator', icon: 'favicon', eyebrow: 'Create', title: 'Favicon generator', description: 'Create a complete favicon package from one image.', tone: 'yellow', artwork: '/assets/penguino-new-tools.png', artworkPosition: 'left' },
   { page: 'bulk-resize', path: '/bulk-image-resizer', icon: 'layers', eyebrow: 'Resize', title: 'Bulk image resizer', description: 'Resize multiple images with one set of dimensions.', tone: 'mint', artwork: '/assets/penguino-new-tools.png', artworkPosition: 'center' },
-  { page: 'pdf-compress', path: '/pdf-compressor', icon: 'pdf', eyebrow: 'Compress', title: 'PDF compressor', description: 'Reduce PDF file size locally in your browser.', tone: 'lavender', artwork: '/assets/penguino-new-tools.png', artworkPosition: 'right' }
+  { page: 'pdf-compress', path: '/pdf-compressor', icon: 'pdf', eyebrow: 'Compress', title: 'PDF compressor', description: 'Reduce PDF file size locally in your browser.', tone: 'lavender', artwork: '/assets/penguino-utility-tools-transparent.png', artworkPosition: '66.666%', artworkColumns: 4 },
+  { page: 'metadata', path: '/metadata-remover', icon: 'shield', eyebrow: 'Protect', title: 'Metadata remover', description: 'Strip hidden information from images.', tone: 'mint', artwork: '/assets/penguino-utility-tools-transparent.png', artworkPosition: '0%', artworkColumns: 4 },
+  { page: 'pack', path: '/file-packer', icon: 'archive', eyebrow: 'Bundle', title: 'File packer', description: 'Put up to 50 files into one tidy ZIP.', tone: 'orange', artwork: '/assets/penguino-utility-tools-transparent.png', artworkPosition: '33.333%', artworkColumns: 4 },
+  { page: 'palette', path: '/colour-palette-extractor', icon: 'palette', eyebrow: 'Discover', title: 'Colour palette', description: 'Pull useful HEX colours from any image.', tone: 'pink', artwork: '/assets/penguino-utility-tools-transparent.png', artworkPosition: '100%', artworkColumns: 4 }
 ]
 
 const pathToPage = (pathname: string): Page => {
@@ -137,7 +156,7 @@ const Dashboard = ({ onOpen }: { onOpen: (page: Page) => void }) => (
       <div className="tool-card-grid">
         {tools.map((tool, index) => (
           <a className={`tool-card tool-card--${tool.tone}`} href={tool.path} key={tool.page} onClick={(event) => { event.preventDefault(); onOpen(tool.page) }} style={{ animationDelay: `${index * 80}ms` }}>
-            <span className="tool-card__visual">{tool.artwork ? <img alt="" className={[tool.artworkPosition ? 'tool-card__sprite-artwork' : '', tool.blendArtwork ? 'tool-card__blend-artwork' : ''].filter(Boolean).join(' ') || undefined} decoding="async" loading="lazy" src={tool.artwork} style={tool.artworkPosition ? { objectPosition: tool.artworkPosition } : undefined} /> : <span className="tool-card__placeholder"><Icon name={tool.icon} /></span>}<i /></span>
+            <span className="tool-card__visual">{tool.artwork ? tool.artworkColumns === 4 ? <span aria-hidden="true" className="tool-card__quad-artwork" style={{ backgroundImage: `url(${tool.artwork})`, backgroundPosition: `${tool.artworkPosition} center` }} /> : <img alt="" className={[tool.artworkPosition ? 'tool-card__sprite-artwork' : '', tool.blendArtwork ? 'tool-card__blend-artwork' : ''].filter(Boolean).join(' ') || undefined} decoding="async" loading="lazy" src={tool.artwork} style={tool.artworkPosition ? { objectPosition: tool.artworkPosition } : undefined} /> : <span className="tool-card__placeholder"><Icon name={tool.icon} /></span>}<i /></span>
             <span className="tool-card__copy"><small>{tool.eyebrow}</small><strong>{tool.title}</strong><span>{tool.description}</span></span>
             <span className="tool-card__arrow"><Icon name="arrow" /></span>
           </a>
@@ -298,6 +317,9 @@ const App = () => {
           {page === 'favicon' ? <FaviconGeneratorTool /> : null}
           {page === 'bulk-resize' ? <BulkImageResizerTool /> : null}
           {page === 'pdf-compress' ? <PdfCompressorTool /> : null}
+          {page === 'metadata' ? <MetadataRemoverTool /> : null}
+          {page === 'pack' ? <FilePackerTool /> : null}
+          {page === 'palette' ? <PaletteExtractorTool /> : null}
         </Suspense>
         {page === 'settings' ? <SettingsPage /> : null}
         {page === 'about' ? <AboutPage /> : null}

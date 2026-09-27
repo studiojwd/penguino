@@ -68,7 +68,7 @@ const BulkImageResizerTool = () => {
   return (
     <div className="simple-tool">
       <aside className="tool-drawer">
-        <div className="tool-drawer__heading"><span className="tool-icon tool-icon--blue"><Icon name="layers" /></span><div><p>Resize</p><h1>Bulk image resizer</h1></div></div>
+        <div className="tool-drawer__heading"><img alt="Penguino resizing multiple images" className="tool-drawer__art tool-drawer__art--sprite" src="/assets/penguino-new-tools.png" style={{ objectPosition: 'center' }} /><div><p>Resize</p><h1>Bulk image resizer</h1></div></div>
         <div className="drop-zone" onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); addFiles(event.dataTransfer.files) }}>
           <input ref={inputRef} accept={ACCEPTED_TYPES.join(',')} className="visually-hidden" multiple onChange={(event) => { if (event.target.files) addFiles(event.target.files); event.target.value = '' }} type="file" />
           <span className="drop-zone__icon"><Icon name="upload" /></span><strong>Drop images here</strong><p>PNG, JPEG or WebP · up to {MAX_FILES} files</p><button className="secondary-button" disabled={files.length >= MAX_FILES} onClick={() => inputRef.current?.click()} type="button">{files.length >= MAX_FILES ? '10 file limit reached' : 'Choose images'}</button>

@@ -13,6 +13,9 @@
 - /favicon-generator: Generate favicon PNG files, Apple Touch and Android icons, a web manifest and HTML markup.
 - /bulk-image-resizer: Resize up to 10 images together and download the results as a ZIP archive.
 - /pdf-compressor: Reduce PDF file size locally by rendering and compressing document pages.
+- /metadata-remover: Remove EXIF, location and other embedded metadata from images.
+- /file-packer: Bundle up to 50 files into a downloadable ZIP archive.
+- /colour-palette-extractor: Extract HEX colour palettes from images and download them as CSS.
 - /settings: Penguino preferences.
 - /about: The story behind Penguino and its creator, Jon Whitby of StudioJWD.
 - /terms: Penguino terms and conditions.

@@ -9,6 +9,9 @@ A standalone local creative toolkit with browser-based tools for:
 - PNG, JPEG, and WebP file conversion
 - Favicon package generation
 - PDF compression
+- Image metadata removal
+- ZIP file packing
+- Colour palette extraction
 
 Penguino runs entirely in the browser. Images are processed locally and are not uploaded. It uses `localStorage` for brand presets, editor settings, saved drafts, and the most recently opened tool. There is no backend.
 
@@ -23,6 +26,9 @@ Penguino runs entirely in the browser. Images are processed locally and are not 
 - `/favicon-generator` — favicon package generator
 - `/bulk-image-resizer` — multi-file image resizer
 - `/pdf-compressor` — browser-side PDF compressor
+- `/metadata-remover` — strip embedded metadata from images
+- `/file-packer` — bundle up to 50 files into a ZIP archive
+- `/colour-palette-extractor` — extract HEX colours and download palette CSS
 - `/settings` — settings placeholder
 - `/about` — about Penguino and its creator
 - `/terms` — terms and conditions
