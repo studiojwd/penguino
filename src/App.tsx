@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import Icon, { type IconName } from './components/Icon'
 import PenguinMascot from './components/PenguinMascot'
+import { toolSeoContent, type ToolPage } from './content/toolSeo'
 
 const TextGraphicTool = lazy(() => import('./tools/TextGraphicTool'))
 const ImageResizerTool = lazy(() => import('./tools/ImageResizerTool'))
@@ -14,7 +15,6 @@ const MetadataRemoverTool = lazy(() => import('./tools/MetadataRemoverTool'))
 const FilePackerTool = lazy(() => import('./tools/FilePackerTool'))
 const PaletteExtractorTool = lazy(() => import('./tools/PaletteExtractorTool'))
 
-type ToolPage = 'text' | 'resize' | 'convert' | 'optimise' | 'remove-background' | 'favicon' | 'bulk-resize' | 'pdf-compress' | 'metadata' | 'pack' | 'palette'
 type Page = 'home' | ToolPage | 'settings' | 'about' | 'terms'
 
 const PAGE_KEY = 'penguino/active-page/v1'
@@ -167,6 +167,17 @@ const Dashboard = ({ onOpen }: { onOpen: (page: Page) => void }) => (
     <section className="privacy-note"><span><Icon name="sparkles" /></span><div><strong>Creative work, kept private.</strong><p>Penguino runs locally. Your images and brand presets never need to leave this browser.</p></div></section>
   </div>
 )
+
+const ToolIntro = ({ page }: { page: ToolPage }) => {
+  const content = toolSeoContent[page]
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: content.faqs.map((faq) => ({ '@type': 'Question', name: faq.question, acceptedAnswer: { '@type': 'Answer', text: faq.answer } }))
+  }
+
+  return <section className="tool-seo-intro"><header><p className="tool-seo-intro__eyebrow">Free browser-based tool</p><h2>{content.heading}</h2>{content.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</header><div className="tool-seo-intro__sections">{content.sections.map((section) => <section key={section.heading}><h3>{section.heading}</h3>{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}</div><section className="tool-seo-intro__steps"><h3>How to use this tool</h3><ol>{content.steps.map((step) => <li key={step}>{step}</li>)}</ol></section><section className="tool-seo-intro__faq"><h3>Frequently asked questions</h3>{content.faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</section><script dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} type="application/ld+json" /></section>
+}
 
 const SettingsPage = () => {
   return (
@@ -321,6 +332,7 @@ const App = () => {
           {page === 'pack' ? <FilePackerTool /> : null}
           {page === 'palette' ? <PaletteExtractorTool /> : null}
         </Suspense>
+        {activeTool ? <ToolIntro page={activeTool.page} /> : null}
         {page === 'settings' ? <SettingsPage /> : null}
         {page === 'about' ? <AboutPage /> : null}
         {page === 'terms' ? <TermsPage /> : null}

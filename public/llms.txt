@@ -1,31 +1,50 @@
 # Penguino
 
-> Penguino is a free, private creative toolkit that runs locally in the browser. Files are processed on the user's device and do not require a backend or account.
+> Penguino is a free collection of private, browser-based creative and file utilities. Processing happens locally on the user's device without an account or backend upload wherever possible.
 
-## Main Pages
+Canonical website: https://www.penguino.app/
 
-- /: Dashboard and directory of available tools.
-- /text-graphic: Create branded text graphics using custom fonts, colours, spacing and export sizes.
-- /image-resizer: Resize a single PNG, JPEG or WebP image to exact pixel dimensions.
-- /file-converter: Convert images between PNG, JPEG and WebP formats.
-- /image-optimiser: Compress an image locally with adjustable quality and a before-and-after comparison.
-- /background-remover: Remove connected solid or simple image backgrounds and export a transparent PNG.
-- /favicon-generator: Generate favicon PNG files, Apple Touch and Android icons, a web manifest and HTML markup.
-- /bulk-image-resizer: Resize up to 10 images together and download the results as a ZIP archive.
-- /pdf-compressor: Reduce PDF file size locally by rendering and compressing document pages.
-- /metadata-remover: Remove EXIF, location and other embedded metadata from images.
-- /file-packer: Bundle up to 50 files into a downloadable ZIP archive.
-- /colour-palette-extractor: Extract HEX colour palettes from images and download them as CSS.
-- /settings: Penguino preferences.
-- /about: The story behind Penguino and its creator, Jon Whitby of StudioJWD.
-- /terms: Penguino terms and conditions.
+## Creative Tools
 
-## Privacy and Processing
+- [Text Graphic](https://www.penguino.app/text-graphic): Create branded text-only graphics with Google Fonts, reusable colour swatches, exact pixel sizing, transparency and PNG, JPEG or WebP export.
+- [Colour Palette Extractor](https://www.penguino.app/colour-palette-extractor): Extract four, six or eight prominent colours from an image, copy HEX values and download the palette as CSS custom properties.
+- [Favicon Generator](https://www.penguino.app/favicon-generator): Generate browser favicons, an Apple Touch icon, Android icons, a web app manifest and installation markup from one image.
 
-- Image and PDF processing happens in the browser.
-- Brand presets and editor preferences are stored in local browser storage.
-- No account or server-side file upload is required.
+## Image Tools
+
+- [Image Resizer](https://www.penguino.app/image-resizer): Resize one PNG, JPEG or WebP by width, height or exact dimensions with aspect-ratio and quality controls.
+- [Bulk Image Resizer](https://www.penguino.app/bulk-image-resizer): Resize up to 10 PNG, JPEG or WebP images using shared settings and download the results as a ZIP archive.
+- [Image Optimiser](https://www.penguino.app/image-optimiser): Compress PNG, JPEG and WebP images with adjustable quality, file-size comparison and a before-and-after preview.
+- [File Converter](https://www.penguino.app/file-converter): Convert image files between PNG, JPEG and WebP with transparency and quality support where available.
+- [Background Remover](https://www.penguino.app/background-remover): Remove connected solid or simple backgrounds, refine tolerance and edge softness, and export a transparent PNG.
+- [Metadata Remover](https://www.penguino.app/metadata-remover): Inspect and remove readable EXIF, GPS, IPTC and XMP metadata from PNG, JPEG and WebP images, then verify the clean copy.
+
+## File And PDF Tools
+
+- [File Packer](https://www.penguino.app/file-packer): Bundle up to 50 files or 500 MB into a named ZIP archive with optional filename prefixing.
+- [PDF Compressor](https://www.penguino.app/pdf-compressor): Reduce PDF file size locally using selectable compression levels. Compressed pages are rebuilt as images.
+
+## Site Pages
+
+- [Home](https://www.penguino.app/): Browse every available Penguino tool.
+- [About](https://www.penguino.app/about): Learn why Penguino exists and about its creator, Jon Whitby of StudioJWD.
+- [Terms and Conditions](https://www.penguino.app/terms): Read the terms for using Penguino.
+- [Settings](https://www.penguino.app/settings): Manage browser-based Penguino preferences.
+
+## Privacy And Processing
+
+- Files are processed in the browser and are not uploaded by the current tools.
+- Brand presets, editor preferences and saved drafts use local browser storage.
+- No account is required.
+- Users should review generated files before relying on them, particularly compressed PDFs and automated background removal.
+
+## Formats And Limits
+
+- Image input and export formats include PNG, JPEG and WebP where supported by the selected tool.
+- Text graphics can be exported as PNG, JPEG or WebP, including transparent PNG and WebP.
+- Bulk image resizing accepts up to 10 images per batch.
+- File Packer accepts up to 50 files or 500 MB per archive.
 
 ## Ownership
 
-Penguino is built by StudioJWD: https://studiojwd.com/
+Penguino is built and maintained by [StudioJWD](https://studiojwd.com/).
