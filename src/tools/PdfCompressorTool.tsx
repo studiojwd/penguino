@@ -3,7 +3,7 @@ import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import Icon from '../components/Icon'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes } from '../utils/imageFiles'
-import { trackEvent } from '../utils/analytics'
+import { trackFileSelected, trackProcessingFailed } from '../utils/analytics'
 
 type CompressionLevel = 'small' | 'balanced' | 'quality'
 
@@ -29,7 +29,7 @@ const PdfCompressorTool = () => {
       setStatus('Please choose a PDF file.')
       return
     }
-    trackEvent('file_selected', { tool: 'pdf-compressor', file_type: 'application/pdf' })
+    void trackFileSelected(nextFile, { tool: 'pdf-compressor' })
     setFile(nextFile)
     setResult(null)
     setProgress(0)
@@ -81,13 +81,14 @@ const PdfCompressorTool = () => {
       const difference = file.size ? Math.round((1 - blob.size / file.size) * 100) : 0
       setStatus(difference > 0 ? `${formatBytes(blob.size)} · ${difference}% smaller` : `${formatBytes(blob.size)} · this PDF did not become smaller`)
     } catch (error) {
+      trackProcessingFailed('pdf-compressor', 'compress_pdf', error)
       setStatus(error instanceof Error ? error.message : 'PDF compression failed.')
     }
   }
 
   const handleDownload = () => {
     if (!file || !result) return
-    downloadBlobFile(result.blob, `${safeFileStem(file.name)}_compressed.pdf`)
+    downloadBlobFile(result.blob, `${safeFileStem(file.name)}_compressed.pdf`, { input_size_bytes: file.size, operation: 'compress_pdf', file_count: 1, page_count: result.pages, compression_level: level })
   }
 
   return (

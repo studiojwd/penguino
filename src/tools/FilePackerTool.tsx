@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import Icon from '../components/Icon'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes } from '../utils/imageFiles'
-import { trackEvent } from '../utils/analytics'
+import { trackFilesSelected, trackProcessingFailed } from '../utils/analytics'
 
 const MAX_FILES = 50
 const MAX_TOTAL_SIZE = 500 * 1024 * 1024
@@ -16,7 +16,7 @@ const FilePackerTool = () => {
 
   const addFiles = (incoming: FileList | File[]) => {
     const candidates = Array.from(incoming)
-    if (candidates.length) trackEvent('file_selected', { tool: 'file-packer', file_type: 'mixed', file_count: candidates.length })
+    trackFilesSelected(candidates, { tool: 'file-packer' })
     setFiles((current) => {
       const existing = new Set(current.map((file) => `${file.name}-${file.size}-${file.lastModified}`))
       const unique = candidates.filter((file) => !existing.has(`${file.name}-${file.size}-${file.lastModified}`))
@@ -48,9 +48,10 @@ const FilePackerTool = () => {
         zip.file(name, file)
       })
       const output = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
-      downloadBlobFile(output, `${safeFileStem(archiveName)}.zip`)
+      downloadBlobFile(output, `${safeFileStem(archiveName)}.zip`, { input_size_bytes: files.reduce((sum, file) => sum + file.size, 0), operation: 'pack_files', file_count: files.length })
       setStatus(`Downloaded ${formatBytes(output.size)} ZIP containing ${files.length} files.`)
     } catch (error) {
+      trackProcessingFailed('file-packer', 'pack_files', error)
       setStatus(error instanceof Error ? error.message : 'The ZIP could not be created.')
     }
   }

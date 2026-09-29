@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { trackProcessingFailed } from '../utils/analytics'
 import { downloadImageBlob, formatBytes, loadImageFile } from '../utils/imageFiles'
 
 const canvasToPng = (canvas: HTMLCanvasElement) => new Promise<Blob>((resolve, reject) => {
@@ -80,6 +81,7 @@ const BackgroundRemoverTool = () => {
         setResultUrl((current) => { if (current) URL.revokeObjectURL(current); return nextUrl })
         setStatus('Background removed. Adjust the controls if the edges need refining.')
       } catch (error) {
+        trackProcessingFailed('background-remover', 'remove_background', error)
         if (!cancelled) setStatus(error instanceof Error ? error.message : 'Background removal failed.')
       }
     }, 220)
@@ -107,7 +109,7 @@ const BackgroundRemoverTool = () => {
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="Best with solid or simple backgrounds" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section"><div className="drawer-section__title"><h2>Background</h2><span className="detected-colour"><i style={{ background: backgroundColour }} />Detected</span></div><label className="field"><span>Removal tolerance {tolerance}</span><input max="120" min="5" step="1" type="range" value={tolerance} onChange={(event) => setTolerance(Number(event.target.value))} /></label><label className="field"><span>Edge softness {softness}</span><input max="60" min="0" step="1" type="range" value={softness} onChange={(event) => setSoftness(Number(event.target.value))} /></label><p className="tool-status tool-status--left">Increase tolerance to remove more. Reduce it if parts of the subject disappear.</p></section>
         {file && resultBlob ? <section className="background-result-summary"><span>Transparent PNG</span><strong>{formatBytes(resultBlob.size)}</strong></section> : null}
-        <button className="penguino-action" disabled={!file || !resultBlob} onClick={() => { if (file && resultBlob) downloadImageBlob(resultBlob, file.name, 'background_removed', 'png') }} type="button"><Icon name="download" /> Download transparent PNG</button>
+        <button className="penguino-action" disabled={!file || !resultBlob} onClick={() => { if (file && resultBlob) downloadImageBlob(resultBlob, file.name, 'background_removed', 'png', '', { input_size_bytes: file.size, operation: 'remove_background', tolerance_band: tolerance < 40 ? 'low' : tolerance < 80 ? 'medium' : 'high' }) }} type="button"><Icon name="download" /> Download transparent PNG</button>
         <p className="tool-status">{status}</p>
       </aside>
       <section className="work-canvas">

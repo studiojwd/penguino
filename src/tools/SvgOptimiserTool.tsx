@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { trackProcessingFailed } from '../utils/analytics'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes } from '../utils/imageFiles'
 
@@ -49,13 +50,14 @@ const SvgOptimiserTool = () => {
       const saving = Math.max(0, Math.round((1 - blob.size / file.size) * 100))
       setStatus(`${formatBytes(blob.size)} · ${saving}% smaller.`)
     } catch (error) {
+      trackProcessingFailed('svg-optimiser', 'optimise_svg', error)
       setStatus(error instanceof Error ? error.message : 'The SVG could not be optimised.')
     }
   }
 
   const handleDownload = () => {
     if (!output || !file) return
-    downloadBlobFile(new Blob([output], { type: 'image/svg+xml' }), `${safeFileStem(file.name)}_optimised.svg`)
+    downloadBlobFile(new Blob([output], { type: 'image/svg+xml' }), `${safeFileStem(file.name)}_optimised.svg`, { input_size_bytes: file.size, operation: 'optimise_svg' })
   }
 
   return <div className="simple-tool">

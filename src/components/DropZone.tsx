@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import Icon from './Icon'
-import { currentToolPath, trackEvent } from '../utils/analytics'
+import { trackFileSelected } from '../utils/analytics'
 
 interface DropZoneProps {
   accept: string
@@ -24,7 +24,7 @@ const DropZone = ({ accept, file, helpText, onFile }: DropZoneProps) => {
         setDragging(false)
         const nextFile = event.dataTransfer.files[0]
         if (nextFile) {
-          trackEvent('file_selected', { tool: currentToolPath(), file_type: nextFile.type || 'unknown' })
+          void trackFileSelected(nextFile)
           onFile(nextFile)
         }
       }}
@@ -36,7 +36,7 @@ const DropZone = ({ accept, file, helpText, onFile }: DropZoneProps) => {
         onChange={(event) => {
           const nextFile = event.target.files?.[0]
           if (nextFile) {
-            trackEvent('file_selected', { tool: currentToolPath(), file_type: nextFile.type || 'unknown' })
+            void trackFileSelected(nextFile)
             onFile(nextFile)
           }
           event.target.value = ''

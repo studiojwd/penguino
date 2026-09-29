@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { trackProcessingFailed } from '../utils/analytics'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes, imageToBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
@@ -95,6 +96,7 @@ const MetadataRemoverTool = () => {
         URL.revokeObjectURL(url)
       }
     } catch (error) {
+      trackProcessingFailed('metadata-remover', 'remove_metadata', error)
       setStatus(error instanceof Error ? error.message : 'The image could not be cleaned.')
     }
   }
@@ -102,7 +104,7 @@ const MetadataRemoverTool = () => {
   const handleDownload = () => {
     if (!file || !cleaned) return
     const extension = format === 'jpeg' ? 'jpg' : format
-    downloadBlobFile(cleaned, `${safeFileStem(file.name)}_clean.${extension}`)
+    downloadBlobFile(cleaned, `${safeFileStem(file.name)}_clean.${extension}`, { input_size_bytes: file.size, operation: 'remove_metadata', metadata_fields_removed: metadata.length })
   }
 
   return (

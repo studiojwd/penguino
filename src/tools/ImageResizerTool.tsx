@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { qualityBucket, trackProcessingFailed } from '../utils/analytics'
 import { downloadImageBlob, formatBytes, imageToBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
 type ResizeMode = 'width' | 'height' | 'exact'
@@ -62,8 +63,9 @@ const ImageResizerTool = () => {
     try {
       const blob = await imageToBlob(image, width, height, format, quality)
       setEstimate(`${formatBytes(blob.size)} ready`)
-      downloadImageBlob(blob, file.name, `${width}x${height}`, format, prefix)
+      downloadImageBlob(blob, file.name, `${width}x${height}`, format, prefix, { input_size_bytes: file.size, operation: 'resize', resize_mode: resizeMode, quality_band: qualityBucket(quality) })
     } catch (error) {
+      trackProcessingFailed('image-resizer', 'resize', error)
       setEstimate(error instanceof Error ? error.message : 'Resize failed.')
     }
   }

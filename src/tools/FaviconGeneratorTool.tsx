@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { trackProcessingFailed } from '../utils/analytics'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes, loadImageFile } from '../utils/imageFiles'
 
@@ -66,9 +67,10 @@ const FaviconGeneratorTool = () => {
       ], theme_color: background, background_color: background, display: 'standalone' }, null, 2))
       zip.file('favicon-markup.html', '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">\n<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n<link rel="manifest" href="/site.webmanifest">\n')
       const output = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
-      downloadBlobFile(output, `${safeFileStem(file.name)}_favicons.zip`)
+      downloadBlobFile(output, `${safeFileStem(file.name)}_favicons.zip`, { input_size_bytes: file.size, operation: 'favicon_package', file_count: 1 })
       setStatus(`Downloaded ${formatBytes(output.size)} favicon package.`)
     } catch (error) {
+      trackProcessingFailed('favicon-generator', 'favicon_package', error)
       setStatus(error instanceof Error ? error.message : 'Favicon generation failed.')
     }
   }

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import Icon from '../components/Icon'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes, imageToBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
-import { trackEvent } from '../utils/analytics'
+import { trackFilesSelected, trackProcessingFailed } from '../utils/analytics'
 
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
 const MAX_FILES = 10
@@ -24,7 +24,7 @@ const BulkImageResizerTool = () => {
     const accepted = Array.from(incoming).filter((file) => ACCEPTED_TYPES.includes(file.type))
     const availableSlots = Math.max(0, MAX_FILES - files.length)
     const filesToAdd = accepted.slice(0, availableSlots)
-    if (filesToAdd.length) trackEvent('file_selected', { tool: 'bulk-image-resizer', file_type: 'image', file_count: filesToAdd.length })
+    trackFilesSelected(filesToAdd, { tool: 'bulk-image-resizer' })
     setFiles((current) => [...current, ...filesToAdd])
     const skipped = accepted.length - filesToAdd.length
     setStatus(skipped > 0
@@ -60,9 +60,10 @@ const BulkImageResizerTool = () => {
         }
       }
       const output = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
-      downloadBlobFile(output, `${prefix.trim() ? `${safeFileStem(prefix)}_` : ''}penguino_resized_${files.length}_images.zip`)
+      downloadBlobFile(output, `${prefix.trim() ? `${safeFileStem(prefix)}_` : ''}penguino_resized_${files.length}_images.zip`, { input_size_bytes: files.reduce((sum, file) => sum + file.size, 0), operation: 'bulk_resize', file_count: files.length, contained_format: format, resize_mode: resizeMode, quality_band: quality < 0.6 ? 'low' : quality < 0.85 ? 'medium' : 'high' })
       setStatus(`Downloaded ${files.length} images · ${formatBytes(output.size)} ZIP.`)
     } catch (error) {
+      trackProcessingFailed('bulk-image-resizer', 'bulk_resize', error)
       setStatus(error instanceof Error ? error.message : 'Bulk resize failed.')
     }
   }

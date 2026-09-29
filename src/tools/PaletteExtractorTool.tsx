@@ -80,7 +80,7 @@ const PaletteExtractorTool = () => {
 
   const downloadPalette = () => {
     const css = `:root {\n${palette.map((colour, index) => `  --colour-${index + 1}: ${colour};`).join('\n')}\n}\n`
-    downloadBlobFile(new Blob([css], { type: 'text/css' }), 'penguino-palette.css')
+    downloadBlobFile(new Blob([css], { type: 'text/css' }), 'penguino-palette.css', { input_size_bytes: file?.size ?? 0, operation: 'extract_palette', colour_count: palette.length })
   }
 
   return (

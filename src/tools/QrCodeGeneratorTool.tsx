@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Icon from '../components/Icon'
+import { trackProcessingFailed } from '../utils/analytics'
 import { downloadBlobFile } from '../utils/downloads'
 
 type ErrorLevel = 'L' | 'M' | 'Q' | 'H'
@@ -38,9 +39,10 @@ const QrCodeGeneratorTool = () => {
       const QRCode = await import('qrcode')
       const dataUrl = await QRCode.toDataURL(value, { width: size, margin, errorCorrectionLevel: level, color: { dark, light } })
       const blob = await fetch(dataUrl).then((response) => response.blob())
-      downloadBlobFile(blob, 'penguino-qr-code.png')
+      downloadBlobFile(blob, 'penguino-qr-code.png', { operation: 'create_qr', output_width: size, output_height: size, error_correction: level })
       setStatus(`${size} × ${size}px PNG downloaded.`)
-    } catch {
+    } catch (error) {
+      trackProcessingFailed('qr-code-generator', 'create_qr_png', error)
       setStatus('The PNG could not be generated.')
     }
   }
@@ -51,9 +53,10 @@ const QrCodeGeneratorTool = () => {
     try {
       const QRCode = await import('qrcode')
       const svg = await QRCode.toString(value, { type: 'svg', margin, errorCorrectionLevel: level, color: { dark, light } })
-      downloadBlobFile(new Blob([svg], { type: 'image/svg+xml' }), 'penguino-qr-code.svg')
+      downloadBlobFile(new Blob([svg], { type: 'image/svg+xml' }), 'penguino-qr-code.svg', { operation: 'create_qr', error_correction: level })
       setStatus('Scalable SVG downloaded.')
-    } catch {
+    } catch (error) {
+      trackProcessingFailed('qr-code-generator', 'create_qr_svg', error)
       setStatus('The SVG could not be generated.')
     }
   }

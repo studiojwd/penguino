@@ -23,7 +23,7 @@ import { buildFilename } from '../utils/filenames'
 import { ensureGoogleFontLoaded } from '../utils/googleFonts'
 import { computeLayout } from '../utils/layout'
 import { loadStoredState, saveBrands, saveEditor } from '../utils/storage'
-import { trackEvent } from '../utils/analytics'
+import { qualityBucket, trackDownload, trackEvent, trackProcessingFailed } from '../utils/analytics'
 
 type PanelKey = 'brand' | 'text' | 'colours' | 'canvas' | 'download'
 type EditorUpdater = EditorState | ((current: EditorState) => EditorState)
@@ -107,7 +107,7 @@ const defaultsFromEditor = (editor: EditorState): BrandPreset['defaults'] => ({
   }
 })
 
-const downloadBlob = (blob: Blob, filename: string, format: ExportFormat) => {
+const downloadBlob = (blob: Blob, filename: string, format: ExportFormat, width: number, height: number, quality: number, transparent: boolean) => {
   const extension = format === 'jpeg' ? 'jpg' : format
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -115,7 +115,7 @@ const downloadBlob = (blob: Blob, filename: string, format: ExportFormat) => {
   link.download = `${filename}.${extension}`
   document.body.appendChild(link)
   link.click()
-  trackEvent('download_completed', { tool: 'text-graphic', file_type: extension })
+  void trackDownload(blob, extension, { tool: 'text-graphic', operation: 'create_text_graphic', output_width: width, output_height: height, transparent_background: transparent, quality_band: qualityBucket(quality) })
   link.remove()
   window.setTimeout(() => URL.revokeObjectURL(url), 500)
 }
@@ -482,9 +482,10 @@ const TextGraphicTool = () => {
         editor.exportFormat,
         editor.exportQuality,
       )
-      downloadBlob(blob, exportFilename, editor.exportFormat)
+      downloadBlob(blob, exportFilename, editor.exportFormat, exportLayout.width, exportLayout.height, editor.exportQuality, editor.transparentBackground)
       setStatusMessage(`Downloaded ${exportFilename}.`)
     } catch (error) {
+      trackProcessingFailed('text-graphic', 'create_text_graphic', error)
       setStatusMessage(error instanceof Error ? error.message : 'Download failed.')
     }
   }
@@ -500,7 +501,7 @@ const TextGraphicTool = () => {
       const exportLayout = computeLayout(editor)
       const { blob } = await exportGraphic(editor, exportLayout, 'png', 1)
       await copyBlobToClipboard(blob)
-      trackEvent('image_copied', { tool: 'text-graphic', file_type: 'png' })
+      trackEvent('image_copied', { tool: 'text-graphic', file_type: 'png', output_size_bytes: blob.size, output_width: exportLayout.width, output_height: exportLayout.height })
       setStatusMessage('Copied image to clipboard.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Clipboard copy failed.')

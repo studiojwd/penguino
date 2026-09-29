@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { qualityBucket, trackProcessingFailed } from '../utils/analytics'
 import { canvasToBlob, drawImageFit, type ImageFit } from '../utils/canvas'
 import { downloadImageBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
@@ -52,9 +53,10 @@ const SocialMediaResizerTool = () => {
       if (!context) throw new Error('Canvas is unavailable in this browser.')
       drawImageFit(context, image, preset.width, preset.height, fit, background)
       const blob = await canvasToBlob(canvas, format, quality)
-      downloadImageBlob(blob, file.name, preset.id, format)
+      downloadImageBlob(blob, file.name, preset.id, format, '', { input_size_bytes: file.size, operation: 'social_resize', preset: preset.id, fit, quality_band: qualityBucket(quality) })
       setStatus(`${preset.label} downloaded at ${preset.width} × ${preset.height}px.`)
     } catch (error) {
+      trackProcessingFailed('social-media-resizer', 'social_resize', error)
       setStatus(error instanceof Error ? error.message : 'The social image could not be created.')
     }
   }

@@ -41,7 +41,7 @@ Penguino runs entirely in the browser. Images are processed locally and are not 
 - `/svg-optimiser` — clean and compress SVG markup
 - `/watermark-tool` — apply custom text watermarks to images
 - `/image-splitter` — divide images into downloadable grid tiles
-- `/settings` — settings placeholder
+- `/settings` — private, locally stored usage statistics
 - `/about` — about Penguino and its creator
 - `/terms` — terms and conditions
 
@@ -88,8 +88,24 @@ Page titles, descriptions, headings and social image paths are maintained in `sr
 - Recent editor settings
 - Saved graphic drafts
 - Favourite and recently used tools
+- Private usage totals shown on the Settings page
 
 Existing Brand Text Graphic Studio data remains compatible. Its saved data continues to use the original `brand-text-graphic-studio` keys so presets and drafts are not lost during the Penguino upgrade.
+
+## Analytics
+
+Penguino sends privacy-conscious product events to GA4. Events include:
+
+- tool and page opened
+- file selection, format, byte size, batch count, and raster dimensions
+- completed processing and downloads, including output format, byte size, and dimensions
+- broad feature choices such as resize mode, preset, quality band, and PDF operation
+- processing failures by error type, without sending error messages
+- favourites, navigation search selection, clipboard use, settings export, and PWA installation
+
+Penguino does not send filenames, file contents, entered text, QR destinations, watermark copy, or exact colours. Personal totals on the Settings page are stored only in local storage and can be cleared by the user at any time.
+
+GA4 receives the custom event parameters immediately. To use them in Explorations and reports, register the descriptive fields such as `tool`, `operation`, `output_format`, `resize_mode`, `preset`, `quality_band`, and `error_type` as event-scoped custom dimensions. Register byte sizes, dimensions, file counts, and page counts as custom metrics.
 
 ## Mascot Artwork
 

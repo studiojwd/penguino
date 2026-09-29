@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { qualityBucket, trackProcessingFailed } from '../utils/analytics'
 import { downloadImageBlob, formatBytes, imageToBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
 const ImageOptimiserTool = () => {
@@ -51,6 +52,7 @@ const ImageOptimiserTool = () => {
         })
         setStatus(blob.size < (file?.size ?? 0) ? 'Optimised and ready to download.' : 'Ready, but the original file is already smaller.')
       } catch (error) {
+        trackProcessingFailed('image-optimiser', 'optimise', error)
         if (!cancelled) setStatus(error instanceof Error ? error.message : 'Image optimisation failed.')
       }
     }, 180)
@@ -87,7 +89,7 @@ const ImageOptimiserTool = () => {
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="PNG, JPEG or WebP" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section"><h2>Compression</h2><label className="field"><span>Output format</span><select value={format} onChange={(event) => setFormat(event.target.value as RasterFormat)}><option value="webp">WebP · recommended</option><option value="jpeg">JPEG</option><option value="png">PNG · lossless</option></select></label>{format !== 'png' ? <label className="field"><span>Quality {Math.round(quality * 100)}%</span><input max="0.98" min="0.2" step="0.01" type="range" value={quality} onChange={(event) => setQuality(Number(event.target.value))} /></label> : <p className="tool-status tool-status--left">PNG is lossless, so its file size may not reduce.</p>}</section>
         {file && optimisedBlob ? <section className="optimiser-savings" aria-label="File size comparison"><div><span>Original</span><strong>{formatBytes(file.size)}</strong></div><Icon name="arrow" /><div><span>Optimised</span><strong>{formatBytes(optimisedBlob.size)}</strong></div><p className={savedBytes > 0 ? 'optimiser-savings__good' : 'optimiser-savings__neutral'}>{savedBytes > 0 ? `${savedPercent}% smaller · ${formatBytes(savedBytes)} saved` : `${formatBytes(Math.abs(savedBytes))} larger than original`}</p></section> : null}
-        <button className="penguino-action" disabled={!file || !optimisedBlob} onClick={() => { if (file && optimisedBlob) downloadImageBlob(optimisedBlob, file.name, 'optimised', format) }} type="button"><Icon name="download" /> Download optimised image</button>
+        <button className="penguino-action" disabled={!file || !optimisedBlob} onClick={() => { if (file && optimisedBlob) downloadImageBlob(optimisedBlob, file.name, 'optimised', format, '', { input_size_bytes: file.size, operation: 'optimise', quality_band: qualityBucket(quality) }) }} type="button"><Icon name="download" /> Download optimised image</button>
         <p className="tool-status">{status}</p>
       </aside>
 

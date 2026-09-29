@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { qualityBucket, trackProcessingFailed } from '../utils/analytics'
 import { downloadImageBlob, formatBytes, imageToBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
 const FileConverterTool = () => {
@@ -30,9 +31,10 @@ const FileConverterTool = () => {
     setStatus('Converting...')
     try {
       const blob = await imageToBlob(image, image.naturalWidth, image.naturalHeight, format, quality)
-      downloadImageBlob(blob, file.name, 'converted', format)
+      downloadImageBlob(blob, file.name, 'converted', format, '', { input_size_bytes: file.size, operation: 'convert', quality_band: qualityBucket(quality) })
       setStatus(`Converted to ${format.toUpperCase()} · ${formatBytes(blob.size)}`)
     } catch (error) {
+      trackProcessingFailed('file-converter', 'convert', error)
       setStatus(error instanceof Error ? error.message : 'Conversion failed.')
     }
   }

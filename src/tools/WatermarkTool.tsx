@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { qualityBucket, trackProcessingFailed } from '../utils/analytics'
 import { canvasToBlob } from '../utils/canvas'
 import { downloadImageBlob, loadImageFile, type RasterFormat } from '../utils/imageFiles'
 
@@ -80,9 +81,10 @@ const WatermarkTool = () => {
       context.drawImage(image, 0, 0)
       drawWatermark(context, canvas.width, canvas.height)
       const blob = await canvasToBlob(canvas, format, quality)
-      downloadImageBlob(blob, file.name, 'watermarked', format)
+      downloadImageBlob(blob, file.name, 'watermarked', format, '', { input_size_bytes: file.size, operation: 'watermark', watermark_position: repeat ? 'repeated' : position, quality_band: qualityBucket(quality) })
       setStatus('Watermarked image downloaded.')
     } catch (error) {
+      trackProcessingFailed('watermark-tool', 'watermark', error)
       setStatus(error instanceof Error ? error.message : 'The watermark could not be applied.')
     }
   }

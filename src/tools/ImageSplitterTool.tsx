@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DropZone from '../components/DropZone'
 import Icon from '../components/Icon'
+import { trackProcessingFailed } from '../utils/analytics'
 import { canvasToBlob } from '../utils/canvas'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { loadImageFile, type RasterFormat } from '../utils/imageFiles'
@@ -59,9 +60,10 @@ const ImageSplitterTool = () => {
         }
       }
       const output = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
-      downloadBlobFile(output, `${safeFileStem(file.name)}_${columns}x${rows}_split.zip`)
+      downloadBlobFile(output, `${safeFileStem(file.name)}_${columns}x${rows}_split.zip`, { input_size_bytes: file.size, operation: 'split_image', file_count: total, grid_columns: columns, grid_rows: rows, contained_format: format })
       setStatus(`${total} tiles downloaded in one ZIP.`)
     } catch (error) {
+      trackProcessingFailed('image-splitter', 'split_image', error)
       setStatus(error instanceof Error ? error.message : 'The image could not be split.')
     }
   }

@@ -1,4 +1,4 @@
-import { currentToolPath, trackEvent } from './analytics'
+import { trackDownload, type DownloadAnalytics } from './analytics'
 
 export type RasterFormat = 'png' | 'jpeg' | 'webp'
 
@@ -45,7 +45,7 @@ export const imageToBlob = async (
   })
 }
 
-export const downloadImageBlob = (blob: Blob, sourceName: string, suffix: string, format: RasterFormat, prefix = '') => {
+export const downloadImageBlob = (blob: Blob, sourceName: string, suffix: string, format: RasterFormat, prefix = '', analytics: DownloadAnalytics = {}) => {
   const stem = sourceName.replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'penguino_image'
   const cleanPrefix = prefix.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '')
   const extension = format === 'jpeg' ? 'jpg' : format
@@ -54,7 +54,7 @@ export const downloadImageBlob = (blob: Blob, sourceName: string, suffix: string
   link.href = url
   link.download = `${cleanPrefix ? `${cleanPrefix}_` : ''}${stem}_${suffix}.${extension}`
   link.click()
-  trackEvent('download_completed', { tool: currentToolPath(), file_type: extension })
+  void trackDownload(blob, extension, analytics)
   window.setTimeout(() => URL.revokeObjectURL(url), 500)
 }
 

@@ -3,7 +3,7 @@ import Icon, { type IconName } from './components/Icon'
 import PenguinMascot from './components/PenguinMascot'
 import pageMetadata from './content/pageMetadata.json'
 import { toolSeoContent, type ToolPage } from './content/toolSeo'
-import { trackEvent } from './utils/analytics'
+import { clearLocalUsageStats, formatLocalBytes, getLocalUsageStats, subscribeToLocalUsageStats, trackEvent } from './utils/analytics'
 
 const TextGraphicTool = lazy(() => import('./tools/TextGraphicTool'))
 const ImageResizerTool = lazy(() => import('./tools/ImageResizerTool'))
@@ -216,14 +216,37 @@ const ToolIntro = ({ page }: { page: ToolPage }) => {
 }
 
 const SettingsPage = () => {
+  const [stats, setStats] = useState(getLocalUsageStats)
+
+  useEffect(() => subscribeToLocalUsageStats(() => setStats(getLocalUsageStats())), [])
+
+  const topToolEntry = Object.entries(stats.toolDownloads).sort(([, left], [, right]) => right - left)[0]
+  const topTool = topToolEntry ? tools.find((tool) => tool.path.slice(1) === topToolEntry[0] || tool.page === topToolEntry[0]) : undefined
+  const topFormat = Object.entries(stats.formats).sort(([, left], [, right]) => right - left)[0]?.[0]
+
   return (
-    <div className="placeholder-page">
-      <section className="placeholder-card">
-        <span className="placeholder-card__icon"><Icon name="settings" /></span>
-        <p>Preferences</p>
-        <h1>Settings</h1>
-        <p className="placeholder-card__intro">Settings and preferences will live here.</p>
-        <span className="placeholder-card__status">Content coming shortly</span>
+    <div className="placeholder-page settings-page">
+      <section className="placeholder-card settings-card">
+        <header className="settings-card__header">
+          <span className="placeholder-card__icon"><Icon name="settings" /></span>
+          <div><p>Your activity</p><h1>Penguino stats</h1><p>Private totals from the work you do in this browser.</p></div>
+        </header>
+
+        <div className="usage-stats-grid">
+          <article><span>Files selected</span><strong>{stats.filesSelected.toLocaleString()}</strong><small>Files stay on this device</small></article>
+          <article><span>Files processed</span><strong>{stats.filesProcessed.toLocaleString()}</strong><small>Across {stats.downloads.toLocaleString()} downloads</small></article>
+          <article><span>Space saved</span><strong>{formatLocalBytes(stats.bytesSaved)}</strong><small>From comparable exports</small></article>
+          <article><span>Data processed</span><strong>{formatLocalBytes(stats.inputBytes)}</strong><small>Locally on this device</small></article>
+        </div>
+
+        <div className="usage-highlights">
+          <div><span>Most-used tool</span><strong>{topTool?.title ?? (topToolEntry?.[0] ? topToolEntry[0].replace(/-/g, ' ') : 'No exports yet')}</strong></div>
+          <div><span>Favourite format</span><strong>{topFormat?.toUpperCase() ?? 'No exports yet'}</strong></div>
+          <div><span>Last activity</span><strong>{stats.updatedAt ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(stats.updatedAt)) : 'Ready when you are'}</strong></div>
+        </div>
+
+        <aside className="settings-privacy-note"><Icon name="shield" /><div><strong>Your files stay private.</strong><p>These personal totals are stored only in this browser. Product analytics never include filenames, image content, entered text or QR destinations.</p></div></aside>
+        <button className="secondary-button settings-clear-button" disabled={!stats.updatedAt} onClick={clearLocalUsageStats} type="button">Clear my local stats</button>
       </section>
     </div>
   )
@@ -323,7 +346,7 @@ const SidebarTools = ({ favourites, page, onOpen }: {
     })
   }
 
-  const toolLink = (tool: (typeof tools)[number], compact = false) => <a aria-current={page === tool.page ? 'page' : undefined} className={`${page === tool.page ? 'nav-item nav-item--active' : 'nav-item'}${compact ? ' nav-item--compact' : ''}`} href={tool.path} key={tool.page} onClick={(event) => { event.preventDefault(); onOpen(tool.page) }}><Icon name={tool.icon} /><span>{tool.navTitle ?? tool.title}</span></a>
+  const toolLink = (tool: (typeof tools)[number], compact = false) => <a aria-current={page === tool.page ? 'page' : undefined} className={`${page === tool.page ? 'nav-item nav-item--active' : 'nav-item'}${compact ? ' nav-item--compact' : ''}`} href={tool.path} key={tool.page} onClick={(event) => { event.preventDefault(); if (normalizedQuery) trackEvent('navigation_search_used', { selected_tool: tool.path.slice(1), query_length: normalizedQuery.length, result_count: matchingGroups.reduce((count, group) => count + group.tools.length, 0) }); onOpen(tool.page) }}><Icon name={tool.icon} /><span>{tool.navTitle ?? tool.title}</span></a>
 
   return <div className="sidebar-tool-browser">
     <label className="sidebar-search">

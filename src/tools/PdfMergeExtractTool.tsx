@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import Icon from '../components/Icon'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes } from '../utils/imageFiles'
-import { trackEvent } from '../utils/analytics'
+import { trackFilesSelected, trackProcessingFailed } from '../utils/analytics'
 
 interface PdfItem {
   id: string
@@ -60,7 +60,7 @@ const PdfMergeExtractTool = () => {
       setFiles((current) => [...current, ...loaded])
       setExtractSource((current) => current || loaded[0]?.id || '')
       setPageSelection('1')
-      trackEvent('file_selected', { tool: 'pdf-merger-extractor', file_type: 'application/pdf', file_count: loaded.length })
+      trackFilesSelected(loaded.map((item) => item.file), { tool: 'pdf-merger-extractor' })
       setStatus(`${loaded.length} PDF${loaded.length === 1 ? '' : 's'} added.`)
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'One of those PDFs could not be opened.')
@@ -98,10 +98,11 @@ const PdfMergeExtractTool = () => {
       }
       const blob = pdfBlob(await output.save({ useObjectStreams: true }))
       const suffix = mode === 'merge' ? 'merged' : 'extracted'
-      downloadBlobFile(blob, `${safeFileStem(filename)}_${suffix}.pdf`)
+      downloadBlobFile(blob, `${safeFileStem(filename)}_${suffix}.pdf`, { input_size_bytes: files.reduce((sum, item) => sum + item.file.size, 0), operation: mode, file_count: mode === 'merge' ? files.length : 1, page_count: output.getPageCount() })
       const pageCount = output.getPageCount()
       setStatus(`${pageCount} page${pageCount === 1 ? '' : 's'} downloaded · ${formatBytes(blob.size)}.`)
     } catch (error) {
+      trackProcessingFailed('pdf-merger-extractor', mode, error)
       setStatus(error instanceof Error ? error.message : 'The PDF could not be created.')
     }
   }
