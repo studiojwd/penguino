@@ -1,19 +1,51 @@
 {
   "name": "Penguino",
   "short_name": "Penguino",
+  "description": "Private, browser-based tools for images, PDFs, files and branded graphics.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/android-chrome-192x192.png?v=penguino-2",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/android-chrome-512x512.png?v=penguino-2",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "theme_color": "#ff742e",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "shortcuts": [
+    {
+      "name": "Text graphic",
+      "short_name": "Text graphic",
+      "url": "/text-graphic",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Image resizer",
+      "short_name": "Resize",
+      "url": "/image-resizer",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Image optimiser",
+      "short_name": "Optimise",
+      "url": "/image-optimiser",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "QR code generator",
+      "short_name": "QR code",
+      "url": "/qr-code-generator",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
 }

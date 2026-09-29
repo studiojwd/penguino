@@ -103,7 +103,7 @@ const BackgroundRemoverTool = () => {
   return (
     <div className="simple-tool background-remover-tool">
       <aside className="tool-drawer">
-        <div className="tool-drawer__heading"><img alt="Penguino removing an image background" className="tool-drawer__art" src="/assets/penguino-background-remover.png" /><div><p>Remove</p><h1>Background remover</h1></div></div>
+        <div className="tool-drawer__heading"><img alt="Penguino removing an image background" className="tool-drawer__art" src="/assets/penguino-background-remover.webp" /><div><p>Remove</p><h1>Background remover</h1></div></div>
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="Best with solid or simple backgrounds" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section"><div className="drawer-section__title"><h2>Background</h2><span className="detected-colour"><i style={{ background: backgroundColour }} />Detected</span></div><label className="field"><span>Removal tolerance {tolerance}</span><input max="120" min="5" step="1" type="range" value={tolerance} onChange={(event) => setTolerance(Number(event.target.value))} /></label><label className="field"><span>Edge softness {softness}</span><input max="60" min="0" step="1" type="range" value={softness} onChange={(event) => setSoftness(Number(event.target.value))} /></label><p className="tool-status tool-status--left">Increase tolerance to remove more. Reduce it if parts of the subject disappear.</p></section>
         {file && resultBlob ? <section className="background-result-summary"><span>Transparent PNG</span><strong>{formatBytes(resultBlob.size)}</strong></section> : null}

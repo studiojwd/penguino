@@ -40,7 +40,7 @@ const FileConverterTool = () => {
   return (
     <div className="simple-tool">
       <aside className="tool-drawer">
-        <div className="tool-drawer__heading"><img alt="Penguino converting JPG to PNG" className="tool-drawer__art" src="/assets/penguino-convert.png" /><div><p>Convert</p><h1>File converter</h1></div></div>
+        <div className="tool-drawer__heading"><img alt="Penguino converting JPG to PNG" className="tool-drawer__art" src="/assets/penguino-convert.webp" /><div><p>Convert</p><h1>File converter</h1></div></div>
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="PNG, JPEG or WebP" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section">
           <h2>Convert to</h2>

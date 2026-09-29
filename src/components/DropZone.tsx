@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import Icon from './Icon'
+import { currentToolPath, trackEvent } from '../utils/analytics'
 
 interface DropZoneProps {
   accept: string
@@ -22,7 +23,10 @@ const DropZone = ({ accept, file, helpText, onFile }: DropZoneProps) => {
         event.preventDefault()
         setDragging(false)
         const nextFile = event.dataTransfer.files[0]
-        if (nextFile) onFile(nextFile)
+        if (nextFile) {
+          trackEvent('file_selected', { tool: currentToolPath(), file_type: nextFile.type || 'unknown' })
+          onFile(nextFile)
+        }
       }}
     >
       <input
@@ -31,7 +35,10 @@ const DropZone = ({ accept, file, helpText, onFile }: DropZoneProps) => {
         className="visually-hidden"
         onChange={(event) => {
           const nextFile = event.target.files?.[0]
-          if (nextFile) onFile(nextFile)
+          if (nextFile) {
+            trackEvent('file_selected', { tool: currentToolPath(), file_type: nextFile.type || 'unknown' })
+            onFile(nextFile)
+          }
           event.target.value = ''
         }}
         type="file"

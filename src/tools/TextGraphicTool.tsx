@@ -23,6 +23,7 @@ import { buildFilename } from '../utils/filenames'
 import { ensureGoogleFontLoaded } from '../utils/googleFonts'
 import { computeLayout } from '../utils/layout'
 import { loadStoredState, saveBrands, saveEditor } from '../utils/storage'
+import { trackEvent } from '../utils/analytics'
 
 type PanelKey = 'brand' | 'text' | 'colours' | 'canvas' | 'download'
 type EditorUpdater = EditorState | ((current: EditorState) => EditorState)
@@ -114,6 +115,7 @@ const downloadBlob = (blob: Blob, filename: string, format: ExportFormat) => {
   link.download = `${filename}.${extension}`
   document.body.appendChild(link)
   link.click()
+  trackEvent('download_completed', { tool: 'text-graphic', file_type: extension })
   link.remove()
   window.setTimeout(() => URL.revokeObjectURL(url), 500)
 }
@@ -126,6 +128,7 @@ const downloadJson = (data: unknown, filename: string) => {
   link.download = filename
   document.body.appendChild(link)
   link.click()
+  trackEvent('settings_exported', { tool: 'text-graphic', file_type: 'json' })
   link.remove()
   window.setTimeout(() => URL.revokeObjectURL(url), 500)
 }
@@ -497,6 +500,7 @@ const TextGraphicTool = () => {
       const exportLayout = computeLayout(editor)
       const { blob } = await exportGraphic(editor, exportLayout, 'png', 1)
       await copyBlobToClipboard(blob)
+      trackEvent('image_copied', { tool: 'text-graphic', file_type: 'png' })
       setStatusMessage('Copied image to clipboard.')
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Clipboard copy failed.')
@@ -536,7 +540,7 @@ const TextGraphicTool = () => {
     <div className="simple-tool simple-tool--text">
       <aside className="tool-drawer text-tool-drawer" aria-label="Text graphic controls">
         <div className="tool-drawer__heading">
-          <img alt="Penguino holding a text tile" className="tool-drawer__art" src="/assets/penguino-text.png" />
+          <img alt="Penguino holding a text tile" className="tool-drawer__art" src="/assets/penguino-text.webp" />
           <div><p>Create</p><h1>Text graphic</h1></div>
         </div>
         <p className="tool-drawer__intro">Make crisp graphics with saved brand colours, Google Fonts and exact pixel sizing.</p>

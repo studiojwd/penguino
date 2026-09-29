@@ -8,7 +8,7 @@ const PenguinMascot = ({ compact = false, label = 'Penguino waving' }: PenguinMa
     alt={label}
     className={`penguin-placeholder ${compact ? 'penguin-placeholder--compact' : ''}`}
     decoding="async"
-    src="/assets/penguino-wave.png"
+    src="/assets/penguino-wave.webp"
   />
 )
 

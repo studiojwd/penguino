@@ -1,3 +1,5 @@
+import { currentToolPath, trackEvent } from './analytics'
+
 export type RasterFormat = 'png' | 'jpeg' | 'webp'
 
 export const loadImageFile = (file: File) =>
@@ -52,6 +54,7 @@ export const downloadImageBlob = (blob: Blob, sourceName: string, suffix: string
   link.href = url
   link.download = `${cleanPrefix ? `${cleanPrefix}_` : ''}${stem}_${suffix}.${extension}`
   link.click()
+  trackEvent('download_completed', { tool: currentToolPath(), file_type: extension })
   window.setTimeout(() => URL.revokeObjectURL(url), 500)
 }
 

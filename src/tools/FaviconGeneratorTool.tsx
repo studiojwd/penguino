@@ -76,7 +76,7 @@ const FaviconGeneratorTool = () => {
   return (
     <div className="simple-tool">
       <aside className="tool-drawer">
-        <div className="tool-drawer__heading"><img alt="Penguino creating favicons" className="tool-drawer__art tool-drawer__art--sprite" src="/assets/penguino-new-tools.png" style={{ objectPosition: 'left' }} /><div><p>Create</p><h1>Favicon generator</h1></div></div>
+        <div className="tool-drawer__heading"><img alt="Penguino creating favicons" className="tool-drawer__art tool-drawer__art--sprite" src="/assets/penguino-new-tools.webp" style={{ objectPosition: 'left' }} /><div><p>Create</p><h1>Favicon generator</h1></div></div>
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="PNG, JPEG or WebP · square recommended" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section"><h2>Appearance</h2><label className="field"><span>Background</span><div className="color-input"><input type="color" value={background} onChange={(event) => setBackground(event.target.value)} /><input type="text" value={background} onChange={(event) => setBackground(event.target.value)} /></div></label><label className="field"><span>Padding {padding}%</span><input max="30" min="0" type="range" value={padding} onChange={(event) => setPadding(Number(event.target.value))} /></label></section>
         <section className="drawer-section"><h2>Package contents</h2><div className="favicon-size-list">{FAVICON_SIZES.map((size) => <span key={size}>{size}×{size}</span>)}</div><p className="tool-status tool-status--left">Includes Apple Touch, Android icons, web manifest and HTML markup.</p></section>

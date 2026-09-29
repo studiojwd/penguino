@@ -71,7 +71,7 @@ const ImageResizerTool = () => {
   return (
     <div className="simple-tool">
       <aside className="tool-drawer">
-        <div className="tool-drawer__heading"><img alt="Penguino resizing an image" className="tool-drawer__art" src="/assets/penguino-resize.png" /><div><p>Resize</p><h1>Image resizer</h1></div></div>
+        <div className="tool-drawer__heading"><img alt="Penguino resizing an image" className="tool-drawer__art" src="/assets/penguino-resize.webp" /><div><p>Resize</p><h1>Image resizer</h1></div></div>
         <DropZone accept="image/png,image/jpeg,image/webp" file={file} helpText="PNG, JPEG or WebP" onFile={(next) => void handleFile(next)} />
         <section className="drawer-section">
           <div className="drawer-section__title"><h2>Dimensions</h2>{sourceWidth ? <span>{sourceWidth} × {sourceHeight}px</span> : null}</div>

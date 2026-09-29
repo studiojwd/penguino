@@ -9,6 +9,8 @@ Canonical website: https://www.penguino.app/
 - [Text Graphic](https://www.penguino.app/text-graphic): Create branded text-only graphics with Google Fonts, reusable colour swatches, exact pixel sizing, transparency and PNG, JPEG or WebP export.
 - [Colour Palette Extractor](https://www.penguino.app/colour-palette-extractor): Extract four, six or eight prominent colours from an image, copy HEX values and download the palette as CSS custom properties.
 - [Favicon Generator](https://www.penguino.app/favicon-generator): Generate browser favicons, an Apple Touch icon, Android icons, a web app manifest and installation markup from one image.
+- [QR Code Generator](https://www.penguino.app/qr-code-generator): Create coloured QR codes for URLs or text and download high-resolution PNG or scalable SVG files.
+- [SVG Optimiser](https://www.penguino.app/svg-optimiser): Remove unnecessary SVG markup, compare file sizes and download a cleaned vector file.
 
 ## Image Tools
 
@@ -18,11 +20,15 @@ Canonical website: https://www.penguino.app/
 - [File Converter](https://www.penguino.app/file-converter): Convert image files between PNG, JPEG and WebP with transparency and quality support where available.
 - [Background Remover](https://www.penguino.app/background-remover): Remove connected solid or simple backgrounds, refine tolerance and edge softness, and export a transparent PNG.
 - [Metadata Remover](https://www.penguino.app/metadata-remover): Inspect and remove readable EXIF, GPS, IPTC and XMP metadata from PNG, JPEG and WebP images, then verify the clean copy.
+- [Social Media Resizer](https://www.penguino.app/social-media-resizer): Resize and crop images for Instagram, Facebook, LinkedIn, X, YouTube and Pinterest using exact platform presets.
+- [Watermark Tool](https://www.penguino.app/watermark-tool): Add positioned or repeated text watermarks to images with colour, size and opacity controls.
+- [Image Splitter](https://www.penguino.app/image-splitter): Divide an image into a custom grid and download every named tile in one ZIP archive.
 
 ## File And PDF Tools
 
 - [File Packer](https://www.penguino.app/file-packer): Bundle up to 50 files or 500 MB into a named ZIP archive with optional filename prefixing.
 - [PDF Compressor](https://www.penguino.app/pdf-compressor): Reduce PDF file size locally using selectable compression levels. Compressed pages are rebuilt as images.
+- [PDF Merger and Extractor](https://www.penguino.app/pdf-merger-extractor): Combine up to 10 PDFs in a chosen order or extract individual pages and ranges into a new PDF.
 
 ## Site Pages
 
@@ -43,6 +49,8 @@ Canonical website: https://www.penguino.app/
 - Image input and export formats include PNG, JPEG and WebP where supported by the selected tool.
 - Text graphics can be exported as PNG, JPEG or WebP, including transparent PNG and WebP.
 - Bulk image resizing accepts up to 10 images per batch.
+- PDF merging accepts up to 10 documents per batch.
+- Image splitting supports grids up to 6 by 6, producing up to 36 tiles.
 - File Packer accepts up to 50 files or 500 MB per archive.
 
 ## Ownership

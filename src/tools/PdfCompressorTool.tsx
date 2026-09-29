@@ -3,6 +3,7 @@ import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import Icon from '../components/Icon'
 import { downloadBlobFile, safeFileStem } from '../utils/downloads'
 import { formatBytes } from '../utils/imageFiles'
+import { trackEvent } from '../utils/analytics'
 
 type CompressionLevel = 'small' | 'balanced' | 'quality'
 
@@ -28,6 +29,7 @@ const PdfCompressorTool = () => {
       setStatus('Please choose a PDF file.')
       return
     }
+    trackEvent('file_selected', { tool: 'pdf-compressor', file_type: 'application/pdf' })
     setFile(nextFile)
     setResult(null)
     setProgress(0)

@@ -193,6 +193,90 @@ export const toolSeoContent = {
       { question: 'Can I copy individual HEX values?', answer: 'Yes. Select any displayed swatch to copy its HEX colour to the clipboard.' },
       { question: 'Does the downloaded palette work in a website stylesheet?', answer: 'Yes. The CSS download contains custom properties inside a root selector, ready to paste into a stylesheet and rename if needed.' }
     ]
+  },
+  'social-resize': {
+    heading: 'Resize images for Instagram and social media',
+    intro: ['Prepare one image for common Instagram, Facebook, LinkedIn, X, YouTube and Pinterest dimensions without looking up pixel sizes each time. Choose a preset and see the final proportions before downloading.', 'Fill mode crops the edges to cover the complete canvas, while Fit mode preserves the entire image and adds a background colour where the proportions differ. All resizing happens locally in your browser.'],
+    sections: [
+      { heading: 'Accurate social media image sizes', paragraphs: ['Use square, portrait, story, landscape, thumbnail and pin presets for everyday publishing workflows. Each exported file uses the exact dimensions displayed in the interface.'] },
+      { heading: 'Choose between cropping and fitting', paragraphs: ['Fill is useful when edge-to-edge artwork matters and a small crop is acceptable. Fit is safer for logos, text and compositions that must remain fully visible, with a selectable colour filling the unused space.'] }
+    ],
+    steps: ['Add a PNG, JPEG or WebP image.', 'Choose a social platform preset and select Fill or Fit.', 'Pick the output format and quality, then download the correctly sized image.'],
+    faqs: [
+      { question: 'Which social media sizes are included?', answer: 'Presets include Instagram square and portrait, stories and reels, Facebook and LinkedIn posts, X posts, YouTube thumbnails and Pinterest pins.' },
+      { question: 'Will Fill mode stretch my image?', answer: 'No. Fill preserves the aspect ratio and crops overflow from the centre rather than stretching the source.' },
+      { question: 'Are social images uploaded?', answer: 'No. Resizing and export are completed locally in your browser.' }
+    ]
+  },
+  'pdf-merge': {
+    heading: 'Merge PDF files or extract selected pages',
+    intro: ['Combine up to ten PDF documents into one file, arrange their order and download a single merged PDF. This is useful for assembling reports, applications, handovers and document packs.', 'Extractor mode creates a new PDF from selected pages or ranges such as 1-3, 5 and 8. The source documents are processed locally and are not uploaded to Penguino.'],
+    sections: [
+      { heading: 'Combine PDFs in the right order', paragraphs: ['Add multiple documents and move them up or down in the queue before merging. Every page from each source is copied into the output without flattening the original document into images.'] },
+      { heading: 'Extract only the pages you need', paragraphs: ['Select one source PDF and enter individual page numbers, ranges or a mixture of both. You can also enter a descending range when pages need to appear in reverse order.'] }
+    ],
+    steps: ['Add one or more PDF files and choose Merge or Extract.', 'Arrange complete documents or select a source and enter page ranges.', 'Choose an output name and download the newly created PDF.'],
+    faqs: [
+      { question: 'Can I change the merge order?', answer: 'Yes. Use the up and down controls beside each document before creating the merged PDF.' },
+      { question: 'How do I enter page ranges?', answer: 'Use commas between selections, for example 1-3, 5, 8. Page numbers start at one, matching the pages shown in normal PDF viewers.' },
+      { question: 'Do PDF files leave my device?', answer: 'No. Merging and extraction use browser memory and local file downloads.' }
+    ]
+  },
+  qr: {
+    heading: 'Generate a QR code as PNG or SVG',
+    intro: ['Turn a website address, contact link, short message or other text into a scannable QR code. The preview updates automatically as you edit the content, colours and quiet zone.', 'Download a high-resolution PNG for documents and graphics or a scalable SVG for print and flexible design work. No content is sent to a QR code service.'],
+    sections: [
+      { heading: 'Customise QR code colours and resilience', paragraphs: ['Choose foreground and background colours with enough contrast for reliable scanning. Error correction controls how much of a damaged or obscured code may still be recoverable, with higher levels producing a denser pattern.'] },
+      { heading: 'Export QR codes for print and web', paragraphs: ['PNG exports are available at several pixel sizes. SVG remains sharp at any scale and is often the best option for professional layout or print software.'] }
+    ],
+    steps: ['Enter the URL or text the QR code should contain.', 'Choose colours, quiet-zone margin, error correction and PNG size.', 'Test the preview with a phone, then download PNG or SVG.'],
+    faqs: [
+      { question: 'Do Penguino QR codes expire?', answer: 'No. The destination is encoded directly into the image, so there is no Penguino redirect or subscription. The destination itself must remain available.' },
+      { question: 'Which export should I use for print?', answer: 'SVG is usually best for print because it scales without becoming pixelated. Always test the finished printed code.' },
+      { question: 'Is my QR content tracked?', answer: 'No. The code is generated locally and Penguino does not create a tracking redirect.' }
+    ]
+  },
+  'svg-optimise': {
+    heading: 'Optimise SVG files and remove unnecessary code',
+    intro: ['Reduce SVG file size by cleaning editor metadata, redundant attributes, unnecessary groups and inefficient path data. Smaller SVG files can improve website delivery while remaining resolution independent.', 'Compare the original and optimised artwork before downloading. Multipass mode searches for additional savings, while readable output keeps the resulting markup easier to inspect.'],
+    sections: [
+      { heading: 'Smaller vector assets for websites', paragraphs: ['Design applications often save production metadata and verbose markup that browsers do not need. SVG optimisation simplifies this code while preserving the rendered vector artwork.'] },
+      { heading: 'Review every optimised SVG', paragraphs: ['The visual comparison helps catch unusual files that depend on editor-specific markup. Keep the original source and verify complex filters, animation, embedded fonts and scripts before replacing a production asset.'] }
+    ],
+    steps: ['Choose an SVG file up to 5 MB.', 'Select multipass optimisation and readable code preferences.', 'Optimise, compare both previews and download the smaller SVG.'],
+    faqs: [
+      { question: 'Does SVG optimisation change image dimensions?', answer: 'It is designed to simplify markup without rasterising or resizing the vector artwork.' },
+      { question: 'Why should I keep the original SVG?', answer: 'Complex SVG features can depend on specific markup. The original remains the safest editable source even when the optimised copy looks identical.' },
+      { question: 'Is SVG code uploaded?', answer: 'No. The source is read and optimised inside your browser.' }
+    ]
+  },
+  watermark: {
+    heading: 'Add a custom text watermark to an image',
+    intro: ['Place a copyright notice, account name, project label or other text over an image before sharing it. Adjust position, colour, size and opacity or repeat the watermark across the complete image.', 'The watermark is rendered into a new PNG, JPEG or WebP file at the original image dimensions. Your untouched source stays on your device.'],
+    sections: [
+      { heading: 'Create a visible but balanced watermark', paragraphs: ['A corner watermark can identify ownership without dominating the image. Repeated watermarks provide broader coverage for proofs and preview assets, while opacity helps keep underlying details visible.'] },
+      { heading: 'Export at the original image size', paragraphs: ['Penguino draws the watermark over the full-resolution source rather than exporting the smaller preview shown on screen. Choose PNG for lossless graphics or JPEG and WebP for adjustable file size.'] }
+    ],
+    steps: ['Add a PNG, JPEG or WebP image.', 'Enter watermark text and choose position, size, colour, opacity or repeat mode.', 'Select an output format and download the full-resolution watermarked copy.'],
+    faqs: [
+      { question: 'Does the watermark resize my image?', answer: 'No. The downloaded image keeps the original pixel dimensions.' },
+      { question: 'Can I repeat the watermark?', answer: 'Yes. Repeat mode covers the image with a diagonal text pattern and disables the single-position control.' },
+      { question: 'Is watermarking a replacement for copyright protection?', answer: 'No. It can identify or discourage casual reuse, but it does not provide technical access control or legal advice.' }
+    ]
+  },
+  split: {
+    heading: 'Split an image into rows and columns',
+    intro: ['Divide one image into an equal grid of up to six rows and six columns. The numbered preview makes each tile clear before the individual files are packaged into one ZIP download.', 'Image splitting is useful for social media grids, carousels, puzzles, print layouts, presentation panels and large artwork that needs to be divided into manageable sections.'],
+    sections: [
+      { heading: 'Create accurate image tiles', paragraphs: ['Penguino calculates every crop boundary from the source dimensions and preserves all pixels, including when a width or height does not divide evenly by the selected grid.'] },
+      { heading: 'Download the complete grid as a ZIP', paragraphs: ['Tiles are named by row and column so they remain easy to arrange. Choose PNG, JPEG or WebP and add a filename prefix before processing the image locally.'] }
+    ],
+    steps: ['Add a PNG, JPEG or WebP image.', 'Choose the number of rows and columns and review the numbered grid.', 'Select a format and download every tile together as a ZIP.'],
+    faqs: [
+      { question: 'How many tiles can I create?', answer: 'Choose between one and six rows and one and six columns, for a maximum of 36 tiles.' },
+      { question: 'Will any pixels be lost?', answer: 'No. Tile boundaries are rounded from the original dimensions so the full source is covered without gaps.' },
+      { question: 'How are split images named?', answer: 'Each filename includes its row and column number, such as tile_r1_c2.png.' }
+    ]
   }
 } as const satisfies Record<string, ToolSeoContent>
 

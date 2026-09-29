@@ -12,8 +12,14 @@ A standalone local creative toolkit with browser-based tools for:
 - Image metadata removal
 - ZIP file packing
 - Colour palette extraction
+- Social media image resizing with platform presets
+- PDF merging and page extraction
+- QR code generation with PNG and SVG export
+- SVG optimisation
+- Text watermarking
+- Image splitting with ZIP export
 
-Penguino runs entirely in the browser. Images are processed locally and are not uploaded. It uses `localStorage` for brand presets, editor settings, saved drafts, and the most recently opened tool. There is no backend.
+Penguino runs entirely in the browser. Images are processed locally and are not uploaded. It uses `localStorage` for brand presets, editor settings, favourites, and recently used tools. There is no backend.
 
 ## Page URLs
 
@@ -29,6 +35,12 @@ Penguino runs entirely in the browser. Images are processed locally and are not 
 - `/metadata-remover` — strip embedded metadata from images
 - `/file-packer` — bundle up to 50 files into a ZIP archive
 - `/colour-palette-extractor` — extract HEX colours and download palette CSS
+- `/social-media-resizer` — resize and crop for common social media dimensions
+- `/pdf-merger-extractor` — merge PDFs or extract selected page ranges
+- `/qr-code-generator` — create QR codes as PNG or SVG
+- `/svg-optimiser` — clean and compress SVG markup
+- `/watermark-tool` — apply custom text watermarks to images
+- `/image-splitter` — divide images into downloadable grid tiles
 - `/settings` — settings placeholder
 - `/about` — about Penguino and its creator
 - `/terms` — terms and conditions
@@ -60,7 +72,13 @@ npm run dev -- --host 127.0.0.1 --port 4175
 npm run build
 ```
 
-The built app is generated in `dist`.
+The built app is generated in `dist`. The build also:
+
+- creates optimised WebP mascot artwork and unique social sharing images
+- pre-renders crawlable HTML, titles, descriptions and canonical URLs for every page
+- includes the installable PWA manifest and offline service worker
+
+Page titles, descriptions, headings and social image paths are maintained in `src/content/pageMetadata.json`. Run `npm run assets` after changing source mascot art if you only want to regenerate the optimised artwork and social cards.
 
 ## What Is Saved Locally
 
@@ -69,12 +87,13 @@ The built app is generated in `dist`.
 - Default font, weight, colours, text case, spacing, padding, and export preferences
 - Recent editor settings
 - Saved graphic drafts
+- Favourite and recently used tools
 
 Existing Brand Text Graphic Studio data remains compatible. Its saved data continues to use the original `brand-text-graphic-studio` keys so presets and drafts are not lost during the Penguino upgrade.
 
 ## Mascot Artwork
 
-The shared waving mascot is stored at `public/assets/penguino-wave.png` and rendered through `src/components/PenguinMascot.tsx`. Tool-specific artwork is stored alongside it as `penguino-text.png`, `penguino-resize.png`, and `penguino-convert.png`.
+Source mascot images are stored in `public/assets`. `npm run assets` creates the smaller WebP versions used by the interface and the 1200 × 630 social cards in `public/og`.
 
 ## Font Size Values
 
